@@ -1,63 +1,36 @@
+import { Star } from 'lucide-react'
+
 const reviews = [
-  {
-    id: 1,
-    name: 'Amara O.',
-    location: 'Lagos, Nigeria',
-    review: 'The quality is unmatched. Every piece I have ordered has exceeded my expectations. This is the only brand I trust for elevated basics.',
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: 'James K.',
-    location: 'London, UK',
-    review: 'Minimal, clean, and incredibly well made. The attention to detail in every garment is something you rarely find at this price point.',
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: 'Sofia M.',
-    location: 'Paris, France',
-    review: 'I bought the linen shirt and the wool coat. Both are perfect. The sizing is accurate and the fabric feels premium.',
-    rating: 5,
-  },
+  { text: "Finally a brand that treats supplements like actual science. I've noticed a significant shift in my focus during work hours.", name: 'Dr. Elena Rodriguez', role: 'Functional Medicine Specialist' },
+  { text: "The transparency is what sold me. Being able to see the batch results for every single bottle is unheard of in this industry.", name: 'Marcus Chen', role: 'Athletic Trainer' },
 ]
 
 export default function Testimonials() {
   return (
-    <section className="bg-gray-50 py-20 px-6">
-      <div className="max-w-7xl mx-auto">
-
-        <div className="text-center mb-12">
-          <p className="text-xs tracking-widest uppercase text-gray-400 mb-2">
-            What They Say
-          </p>
-          <h2 className="text-3xl font-black uppercase tracking-wide text-gray-900">
-            Customer Reviews
-          </h2>
+    <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div>
+        <h2 className="text-2xl font-bold text-[#1F2421] mb-3">Trusted by over 30,000 health seekers.</h2>
+        <p className="text-sm text-[#8A928E] mb-6">Real results from people who prioritize their physiological well-being as much as we do.</p>
+        <div className="flex items-center gap-3">
+          <div className="flex -space-x-2">
+            {['#F2D6A2', '#A2C9E0', '#B7D8A8'].map((c) => (
+              <div key={c} className="w-8 h-8 rounded-full border-2 border-white" style={{ backgroundColor: c }} />
+            ))}
+          </div>
+          <span className="text-sm font-medium text-[#1F2421]">4.9/5 Average Rating</span>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {reviews.map(({ id, name, location, review, rating }) => (
-            <div key={id} className="bg-white p-8 border border-gray-100">
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: rating }).map((_, i) => (
-                  <span key={i} className="text-black text-sm">★</span>
-                ))}
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed mb-6 italic">
-                {review}
-              </p>
-              <div>
-                <p className="text-xs font-bold tracking-widest uppercase text-gray-900">
-                  {name}
-                </p>
-                <p className="text-xs text-gray-400 tracking-wide">{location}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
       </div>
+
+      {reviews.map((r) => (
+        <div key={r.name} className="bg-[#EFEDE6] rounded-2xl p-6">
+          <div className="flex gap-1 text-[#5F7A5B] mb-4">
+            {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={13} fill="currentColor" />)}
+          </div>
+          <p className="text-sm text-[#1F2421] leading-relaxed mb-6">&ldquo;{r.text}&rdquo;</p>
+          <p className="text-sm font-semibold text-[#1F2421]">{r.name}</p>
+          <p className="text-xs text-[#8A928E]">{r.role}</p>
+        </div>
+      ))}
     </section>
   )
 }

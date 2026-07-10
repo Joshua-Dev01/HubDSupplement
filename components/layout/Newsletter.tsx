@@ -1,47 +1,23 @@
-import Image from 'next/image'
+import { SITE } from '@/lib/constants'
 
 export default function Newsletter() {
   return (
-    <section className="border-t border-gray-200 bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-32 flex flex-col lg:flex-row items-center gap-20">
-
-        {/* Left — Image */}
-        <div className="w-full lg:w-3/5 relative overflow-hidden aspect-video group">
-          <Image
-            src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1200&q=80"
-            alt="Newsletter"
-            fill
-            className="object-cover grayscale brightness-95 transition-all duration-[3000ms] group-hover:grayscale-0 group-hover:scale-105"
-          />
-        </div>
-
-        {/* Right — Form */}
-        <div className="w-full lg:w-2/5 space-y-10">
-          <div className="space-y-4">
-            <h2 className="text-5xl font-black uppercase tracking-tight text-gray-900 leading-tight">
-              The Inner Circle
-            </h2>
-            <p className="text-gray-500 leading-relaxed">
-              Gain priority access to limited edition drops, seasonal lookbooks, and private gallery installations.
-            </p>
-          </div>
-
-          <form className="flex flex-col gap-8">
-            <input
-              type="email"
-              placeholder="EMAIL ADDRESS"
-              className="w-full bg-transparent border-b border-gray-300 focus:border-black px-0 py-4 text-xs outline-none tracking-widest uppercase placeholder:text-gray-300 transition-all"
-            />
-            <button
-              type="submit"
-              className="w-fit px-12 py-5 bg-black text-white text-xs uppercase tracking-widest hover:opacity-80 transition-all"
-            >
-              Join Us
-            </button>
-          </form>
-        </div>
-
-      </div>
+    <section className="mx-6 mb-20 rounded-3xl bg-[#2E3634] px-8 py-16 text-center max-w-7xl md:mx-auto">
+      <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Join the {SITE.name} Circle</h2>
+      <p className="text-sm text-white/70 max-w-md mx-auto mb-8">
+        Receive expert-curated wellness insights, early access to clinical formulations, and 10% off your first order.
+      </p>
+      <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <input
+          type="email"
+          placeholder="Your clinical email address"
+          className="flex-1 bg-white/10 border border-white/20 rounded-full px-5 py-3 text-sm text-white placeholder:text-white/40 outline-none focus:border-white/50"
+        />
+        <button type="submit" className="bg-[#5F7A5B] text-white rounded-full px-6 py-3 text-sm font-medium hover:bg-[#4F6A4B] transition-colors">
+          Subscribe →
+        </button>
+      </form>
+      <p className="text-[10px] text-white/30 uppercase tracking-widest mt-6">Scientific insights only, no spam</p>
     </section>
   )
 }

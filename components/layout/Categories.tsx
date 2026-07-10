@@ -1,53 +1,33 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import { Droplet, TrendingUp, Leaf, Moon, Shield, type LucideIcon } from 'lucide-react'
+import { CATEGORIES } from '@/lib/constants'
 
-const categories = [
-  {
-    label: 'Men',
-    href: '/products?category=men',
-    image: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&q=80',
-  },
-  {
-    label: 'Women',
-    href: '/products?category=women',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80',
-  },
-  {
-    label: 'Accessories',
-    href: '/products?category=accessories',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80',
-  },
-]
+const ICONS: Record<string, LucideIcon> = {
+  droplet: Droplet,
+  'trending-up': TrendingUp,
+  leaf: Leaf,
+  moon: Moon,
+  shield: Shield,
+}
 
 export default function Categories() {
   return (
-    <section className="grid grid-cols-3 gap-1 w-full">
-      {categories.map(({ label, href, image }) => (
-        <Link
-          key={label}
-          href={href}
-          className="relative overflow-hidden group h-125"
-        >
-          {/* Image */}
-          <Image
-            src={image}
-            alt={label}
-            fill
-            className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-          />
-
-          {/* subtle dark overlay on hover */}
-          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-500" />
-
-          {/* Label bottom left */}
-          <div className="absolute bottom-5 left-5 z-10">
-            <span className="text-white text-sm font-semibold tracking-widest uppercase drop-shadow-md">
-              {label}
-            </span>
-          </div>
-
-        </Link>
-      ))}
+    <section className="max-w-7xl mx-auto px-6 pb-16">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {CATEGORIES.map(({ label, href, icon }) => {
+          const Icon = ICONS[icon]
+          return (
+            <Link
+              key={label}
+              href={href}
+              className="bg-[#EFEDE6] hover:bg-[#E5E2D8] rounded-2xl p-6 flex flex-col gap-4 transition-colors"
+            >
+              <Icon size={20} className="text-[#5F7A5B]" />
+              <span className="text-sm font-medium text-[#1F2421]">{label}</span>
+            </Link>
+          )
+        })}
+      </div>
     </section>
   )
 }
