@@ -1,16 +1,17 @@
+
 export const SITE = {
-  name: 'Vitalis',
+  name: 'HubDsupplement',
   tagline: 'Precision Care For Your Wellbeing.',
   description:
     'Clinically formulated wellness essentials backed by science and sourced responsibly.',
 }
 
 export const CATEGORIES = [
-  { label: 'Vitamins', href: '/products?category=vitamins', icon: 'droplet' },
-  { label: 'Protein', href: '/products?category=protein', icon: 'trending-up' },
-  { label: 'Herbal', href: '/products?category=herbal', icon: 'leaf' },
-  { label: 'Sleep', href: '/products?category=sleep', icon: 'moon' },
-  { label: 'Immunity', href: '/products?category=immunity', icon: 'shield' },
+  { label: 'Vitamins', value: 'vitamins', icon: 'droplet' },
+  { label: 'Protein', value: 'protein', icon: 'trending-up' },
+  { label: 'Herbal', value: 'herbal', icon: 'leaf' },
+  { label: 'Sleep', value: 'sleep', icon: 'moon' },
+  { label: 'Immunity', value: 'immunity', icon: 'shield' },
 ] as const
 
 export const TRUST_BADGES = [

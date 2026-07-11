@@ -31,7 +31,7 @@ export default function BestSellers() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {products.map((p) => (
           <div key={p.id} className="bg-white rounded-2xl overflow-hidden border border-black/5">
             <Link href={`/products/${p.slug}`} className="relative block aspect-[4/3] bg-[#EFEDE6]">

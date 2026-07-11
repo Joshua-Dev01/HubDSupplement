@@ -40,38 +40,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md bg-white p-8 shadow-sm">
-
-        <h1 className="text-2xl font-black tracking-widest uppercase text-center mb-8">
-          Login
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#F7F5F0] px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm">
+        <h1 className="text-2xl font-bold text-[#1F2421] text-center mb-8">Login</h1>
 
         <form action={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label className="text-xs tracking-widest uppercase text-gray-500">Email</label>
+            <label className="text-xs uppercase tracking-widest text-[#8A928E]">Email</label>
             <input
               name="email"
               type="email"
               placeholder="you@example.com"
               required
-              className="border border-gray-200 px-4 py-3 text-sm outline-none focus:border-black transition-colors"
+              className="border border-black/10 rounded-full px-4 py-3 text-sm outline-none focus:border-[#5F7A5B] transition-colors"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-xs tracking-widest uppercase text-gray-500">Password</label>
+            <label className="text-xs uppercase tracking-widest text-[#8A928E]">Password</label>
             <input
               name="password"
               type="password"
               placeholder="Your password"
               required
-              className="border border-gray-200 px-4 py-3 text-sm outline-none focus:border-black transition-colors"
+              className="border border-black/10 rounded-full px-4 py-3 text-sm outline-none focus:border-[#5F7A5B] transition-colors"
             />
           </div>
 
           <div className="text-right">
-            <Link href="/forgot-password" className="text-xs text-gray-400 hover:text-black transition-colors">
+            <Link href="/forgot-password" className="text-xs text-[#8A928E] hover:text-[#1F2421] transition-colors">
               Forgot password?
             </Link>
           </div>
@@ -79,22 +76,22 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-black text-white py-3 text-xs cursor-pointer tracking-widest uppercase hover:bg-gray-800 transition-colors disabled:opacity-50"
+            className="bg-[#5F7A5B] text-white py-3 rounded-full text-sm font-medium cursor-pointer hover:bg-[#4F6A4B] transition-colors disabled:opacity-50"
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <div className="flex items-center gap-4 my-6">
-          <hr className="flex-1 border-gray-200" />
-          <span className="text-xs text-gray-400 uppercase tracking-wider">or</span>
-          <hr className="flex-1 border-gray-200" />
+          <hr className="flex-1 border-black/10" />
+          <span className="text-xs text-[#8A928E] uppercase tracking-wider">or</span>
+          <hr className="flex-1 border-black/10" />
         </div>
 
-        <form action={async () => await signInWithGoogle()}>
+        <form action={async () => { await signInWithGoogle() }}>
           <button
             type="submit"
-            className="w-full border border-gray-200 py-3 text-sm flex items-center justify-center cursor-pointer gap-3 hover:bg-gray-50 transition-colors"
+            className="w-full border border-black/10 rounded-full py-3 text-sm flex items-center justify-center cursor-pointer gap-3 hover:bg-[#F7F5F0] transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -106,11 +103,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-[#8A928E] mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-black font-medium underline">Sign Up</Link>
+          <Link href="/signup" className="text-[#1F2421] font-medium underline">Sign Up</Link>
         </p>
-
       </div>
     </div>
   )
