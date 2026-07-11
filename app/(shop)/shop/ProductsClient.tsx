@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { SlidersHorizontal, ShoppingBag, Loader2 } from 'lucide-react'
+import { SlidersHorizontal, Loader2 } from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
 import { useCartStore } from '@/store/cartStore'
 import type { Product } from '@/types/product'
+import { FaCartPlus } from 'react-icons/fa'
 
 const TABS = ['All', ...CATEGORIES.map((c) => c.label)]
 const LABEL_TO_VALUE: Record<string, string> = Object.fromEntries(
@@ -24,22 +25,26 @@ function ProductCard({ product }: { product: Product }) {
   async function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault()
     setLoading(true)
-    const result = await addItem(product.id)
-    setLoading(false)
 
-    if (result.error === 'not_authenticated') {
-      toast.error('Please log in to add items to your cart')
-      router.push('/login')
-      return
-    }
-    if (result.error) {
-      toast.error(result.error)
-      return
-    }
+    try {
+      const result = await addItem(product.id)
 
-    setAdded(true)
-    toast.success('Added to cart')
-    setTimeout(() => setAdded(false), 1500)
+      if (result.error === 'not_authenticated') {
+        toast.error('Please log in to add items to your cart')
+        router.push('/login')
+        return
+      }
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+
+      setAdded(true)
+      toast.success('Added to cart')
+      setTimeout(() => setAdded(false), 1500)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const image = product.images?.[0] ?? 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=600&q=80'
@@ -60,10 +65,10 @@ function ProductCard({ product }: { product: Product }) {
           onClick={handleQuickAdd}
           disabled={loading || !product.in_stock}
           className={`absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 ${
-            added ? 'bg-green-600 text-white' : 'bg-white text-[#1F2421] hover:bg-[#5F7A5B] hover:text-white'
+            added ? 'bg-green-600 text-white' : 'bg-[#5F7A5B] cursor-pointer  hover:bg-[#5F7A5B] text-white'
           }`}
         >
-          {loading ? <Loader2 size={14} className="animate-spin" /> : <ShoppingBag size={14} />}
+          {loading ? <Loader2 size={14} className="animate-spin" /> : <FaCartPlus size={14} />}
         </button>
       </div>
 

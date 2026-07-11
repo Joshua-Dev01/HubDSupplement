@@ -63,41 +63,63 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   addItem: async (productId: string) => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    try {
+      const supabase = createClient()
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!user) return { error: 'not_authenticated' }
+      if (userError) {
+        console.error('Auth check failed in addItem:', userError)
+        return { error: userError.message }
+      }
+      if (!user) return { error: 'not_authenticated' }
 
-    const existing = get().items.find((i) => i.product_id === productId)
-    if (existing) {
-      await get().updateQuantity(existing.id, existing.quantity + 1)
+      const existing = get().items.find((i) => i.product_id === productId)
+      if (existing) {
+        await get().updateQuantity(existing.id, existing.quantity + 1)
+        return {}
+      }
+
+      const { error } = await supabase
+        .from('cart_items')
+        .insert({ user_id: user.id, product_id: productId, quantity: 1 })
+
+      if (error) {
+        console.error('Add to cart error:', error.message, error.details, error.hint)
+        return { error: error.message }
+      }
+
+      await get().init()
       return {}
+    } catch (err) {
+      console.error('addItem threw an exception:', err)
+      return { error: 'Something went wrong adding this to your cart' }
     }
-
-    const { error } = await supabase
-      .from('cart_items')
-      .insert({ user_id: user.id, product_id: productId, quantity: 1 })
-
-    if (error) return { error: error.message }
-
-    await get().init()
-    return {}
   },
 
   updateQuantity: async (cartItemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      await get().removeItem(cartItemId)
-      return
+    try {
+      if (quantity <= 0) {
+        await get().removeItem(cartItemId)
+        return
+      }
+      const supabase = createClient()
+      const { error } = await supabase.from('cart_items').update({ quantity }).eq('id', cartItemId)
+      if (error) console.error('Update quantity error:', error.message)
+      await get().init()
+    } catch (err) {
+      console.error('updateQuantity threw an exception:', err)
     }
-    const supabase = createClient()
-    await supabase.from('cart_items').update({ quantity }).eq('id', cartItemId)
-    await get().init()
   },
 
   removeItem: async (cartItemId: string) => {
-    const supabase = createClient()
-    await supabase.from('cart_items').delete().eq('id', cartItemId)
-    await get().init()
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('cart_items').delete().eq('id', cartItemId)
+      if (error) console.error('Remove item error:', error.message)
+      await get().init()
+    } catch (err) {
+      console.error('removeItem threw an exception:', err)
+    }
   },
 
   subscribeRealtime: () => {
