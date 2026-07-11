@@ -96,6 +96,7 @@ export async function createOrder(data: CheckoutData) {
     created_at: order.created_at,
     items: cartItems.map((item: any) => ({
       product_name: item.product.name,
+      product_image: item.product.images?.[0] ?? null,
       quantity: item.quantity,
       price: item.product.price,
     })),

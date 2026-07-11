@@ -296,7 +296,7 @@ export default function CheckoutPage() {
                   placeholder="Enter code"
                   className="flex-1 border border-black/10 rounded-full px-4 py-2.5 text-sm outline-none focus:border-[#5F7A5B] transition-colors"
                 />
-                <button onClick={handleApplyPromo} className="bg-[#5F7A5B] hover:bg-[#4F6A4B] text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors">
+                <button onClick={handleApplyPromo} className="bg-[#5F7A5B] cursor-pointer hover:bg-[#4F6A4B] text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors">
                   Apply
                 </button>
               </div>
@@ -305,7 +305,7 @@ export default function CheckoutPage() {
             <button
               onClick={handleCheckout}
               disabled={processing}
-              className="w-full flex items-center justify-center gap-2 bg-[#1F2421] hover:bg-[#2E3634] disabled:opacity-50 text-white font-medium py-4 rounded-full transition-colors mb-4"
+              className="w-full flex items-center cursor-pointer justify-center gap-2 bg-[#1F2421] hover:bg-[#2E3634] disabled:opacity-50 text-white font-medium py-4 rounded-full transition-colors mb-4"
             >
               {processing ? <Loader2 size={16} className="animate-spin" /> : (
                 <>

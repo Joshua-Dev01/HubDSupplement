@@ -1,44 +1,57 @@
 type OrderItem = {
-  product_name: string
-  quantity: number
-  price: number
-}
+  product_name: string;
+  product_image: string | null;
+  quantity: number;
+  price: number;
+};
 
 type OrderDetails = {
-  id: string
-  full_name: string
-  email: string
-  phone: string
-  address: string
-  city: string
-  state: string
-  subtotal: number
-  shipping_fee: number
-  tax: number
-  total: number
-  created_at: string
-  items: OrderItem[]
-}
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  subtotal: number;
+  shipping_fee: number;
+  tax: number;
+  total: number;
+  created_at: string;
+  items: OrderItem[];
+};
 
 function formatNaira(amount: number) {
-  return `₦${amount.toLocaleString('en-NG')}`
+  return `₦${amount.toLocaleString("en-NG")}`;
 }
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=200&q=80";
 
 export function customerReceiptHTML(order: OrderDetails) {
   const itemsRows = order.items
     .map(
       (item) => `
       <tr>
-        <td style="padding: 12px 0; border-bottom: 1px solid #eee;">
+        <td style="padding: 12px 0; border-bottom: 1px solid #eee; width: 64px;">
+          <img
+            src="${item.product_image ?? FALLBACK_IMAGE}"
+            alt="${item.product_name}"
+            width="56"
+            height="56"
+            style="width: 56px; height: 56px; object-fit: cover; border-radius: 8px; display: block; background: #EFEDE6;"
+          />
+        </td>
+        <td style="padding: 12px 12px; border-bottom: 1px solid #eee;">
           <p style="margin: 0; font-weight: 600; font-size: 14px; color: #1F2421;">${item.product_name}</p>
           <p style="margin: 4px 0 0; font-size: 12px; color: #8A928E;">Qty: ${item.quantity}</p>
         </td>
-        <td style="padding: 12px 0; border-bottom: 1px solid #eee; text-align: right; font-size: 14px; color: #1F2421;">
+        <td style="padding: 12px 0; border-bottom: 1px solid #eee; text-align: right; font-size: 14px; color: #1F2421; white-space: nowrap;">
           ${formatNaira(item.price * item.quantity)}
         </td>
-      </tr>`
+      </tr>`,
     )
-    .join('')
+    .join("");
 
   return `
   <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #1F2421;">
@@ -53,7 +66,7 @@ export function customerReceiptHTML(order: OrderDetails) {
       </p>
 
       <p style="font-size: 12px; color: #888; margin: 0 0 24px; text-transform: uppercase; letter-spacing: 1px;">
-        Order #${order.id.slice(0, 8).toUpperCase()} · ${new Date(order.created_at).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}
+        Order #${order.id.slice(0, 8).toUpperCase()} · ${new Date(order.created_at).toLocaleDateString("en-NG", { year: "numeric", month: "long", day: "numeric" })}
       </p>
 
       <table style="width: 100%; border-collapse: collapse;">
@@ -67,7 +80,7 @@ export function customerReceiptHTML(order: OrderDetails) {
         </tr>
         <tr>
           <td style="padding: 4px 0; font-size: 14px; color: #555;">Shipping</td>
-          <td style="padding: 4px 0; font-size: 14px; text-align: right;">${order.shipping_fee === 0 ? 'Free' : formatNaira(order.shipping_fee)}</td>
+          <td style="padding: 4px 0; font-size: 14px; text-align: right;">${order.shipping_fee === 0 ? "Free" : formatNaira(order.shipping_fee)}</td>
         </tr>
         <tr>
           <td style="padding: 4px 0; font-size: 14px; color: #555;">Tax</td>
@@ -92,16 +105,27 @@ export function customerReceiptHTML(order: OrderDetails) {
       </p>
     </div>
   </div>
-  `
+  `;
 }
 
 export function adminNotificationHTML(order: OrderDetails) {
   const itemsList = order.items
     .map(
-      (item) =>
-        `<li style="font-size: 14px; margin-bottom: 4px;">${item.product_name} × ${item.quantity} — ${formatNaira(item.price * item.quantity)}</li>`
+      (item) => `
+        <tr>
+          <td style="padding: 6px 8px 6px 0; width: 44px;">
+            <img
+              src="${item.product_image ?? FALLBACK_IMAGE}"
+              alt="${item.product_name}"
+              width="40"
+              height="40"
+              style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; display: block; background: #EFEDE6;"
+            />
+          </td>
+          <td style="padding: 6px 0; font-size: 14px;">${item.product_name} × ${item.quantity} — ${formatNaira(item.price * item.quantity)}</td>
+        </tr>`,
     )
-    .join('')
+    .join("");
 
   return `
   <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #1F2421;">
@@ -115,7 +139,7 @@ export function adminNotificationHTML(order: OrderDetails) {
       <p style="font-size: 14px;"><strong>Address:</strong> ${order.address}, ${order.city}, ${order.state}</p>
 
       <h3 style="font-size: 14px; margin-top: 20px;">Items:</h3>
-      <ul style="padding-left: 18px;">${itemsList}</ul>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">${itemsList}</table>
 
       <p style="font-size: 16px; font-weight: 700; margin-top: 20px;">Total: ${formatNaira(order.total)}</p>
 
@@ -124,5 +148,5 @@ export function adminNotificationHTML(order: OrderDetails) {
       </a>
     </div>
   </div>
-  `
+  `;
 }
