@@ -8,5 +8,9 @@ export type Product = {
   description: string | null
   is_new: boolean
   in_stock: boolean
+  rating?: number
+  review_count?: number
+  supply_days?: number
+  subscription_discount_pct?: number
   created_at?: string
 }

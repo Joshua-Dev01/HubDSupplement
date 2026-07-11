@@ -59,12 +59,13 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-40 bg-[#F7F5F0]/95 backdrop-blur border-b border-black/5 py-4">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between gap-6">
-          <Link
-            href="/"
-            className="text-lg font-bold tracking-tight text-[#1F2421] shrink-0"
-          >
-            {SITE.name}
+        <div className="max-w-7xl mx-auto px-2 flex items-center justify-between gap-6">
+          <Link href="/" className="flex items-center">
+            <img
+              src="/images/logo1.png"
+              alt={SITE.name ?? "Logo"}
+              className="h-14 w-auto object-contain md:h-20"
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm text-[#3F4744]">

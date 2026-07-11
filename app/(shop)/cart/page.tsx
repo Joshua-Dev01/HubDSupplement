@@ -62,17 +62,17 @@ export default function CartPage() {
                     </div>
 
                     <div className="flex justify-between items-end mt-4">
-                      <div className="flex items-center border border-black/10 rounded-full">
+                      <div className="flex items-center border cursor-pointer border-black/10 rounded-full">
                         <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1.5 text-[#8A928E] hover:text-[#1F2421] transition-colors">
-                          <Minus size={12} />
+                          <Minus size={12} className='cursor-pointer' />
                         </button>
-                        <span className="w-8 text-center text-xs font-medium text-[#1F2421]">{item.quantity}</span>
+                        <span className="w-8 text-center text-xs font-medium cursor-pointer text-[#1F2421]">{item.quantity}</span>
                         <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1.5 text-[#8A928E] hover:text-[#1F2421] transition-colors">
-                          <Plus size={12} />
+                          <Plus size={12} className='cursor-pointer' />
                         </button>
                       </div>
 
-                      <button onClick={() => removeItem(item.id)} className="flex items-center gap-1.5 text-xs text-[#8A928E] hover:text-red-500 transition-colors">
+                      <button onClick={() => removeItem(item.id)} className="flex cursor-pointer items-center gap-1.5 text-xs text-[#8A928E] hover:text-red-500 transition-colors">
                         <Trash2 size={13} />
                         Remove
                       </button>

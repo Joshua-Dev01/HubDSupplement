@@ -23,11 +23,13 @@ function ProductCard({ product }: { product: Product }) {
   const router = useRouter()
 
   async function handleQuickAdd(e: React.MouseEvent) {
+    console.log('🔵 Quick Add clicked! product.id =', product.id)
     e.preventDefault()
     setLoading(true)
 
     try {
       const result = await addItem(product.id)
+      console.log('🔵 addItem result:', result)
 
       if (result.error === 'not_authenticated') {
         toast.error('Please log in to add items to your cart')
@@ -48,6 +50,7 @@ function ProductCard({ product }: { product: Product }) {
   }
 
   const image = product.images?.[0] ?? 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=600&q=80'
+  const isSoldOut = product.in_stock === false
 
   return (
     <Link href={`/products/${product.slug}`} className="group cursor-pointer">
@@ -57,13 +60,13 @@ function ProductCard({ product }: { product: Product }) {
         {product.is_new && (
           <span className="absolute top-3 left-3 bg-[#1F2421] text-white text-[10px] uppercase tracking-wider px-2 py-1 rounded-full">New</span>
         )}
-        {!product.in_stock && (
+        {isSoldOut && (
           <span className="absolute top-3 right-3 bg-gray-400 text-white text-[10px] uppercase tracking-wider px-2 py-1 rounded-full">Sold Out</span>
         )}
 
         <button
           onClick={handleQuickAdd}
-          disabled={loading || !product.in_stock}
+          disabled={loading || isSoldOut}
           className={`absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 ${
             added ? 'bg-green-600 text-white' : 'bg-[#5F7A5B] cursor-pointer  hover:bg-[#5F7A5B] text-white'
           }`}
