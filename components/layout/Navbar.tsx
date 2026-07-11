@@ -76,13 +76,13 @@ export default function Navbar() {
               href="/shop"
               className="hover:text-[#1F2421] transition-colors"
             >
-              Shop All
+              Products
             </Link>
             <Link
-              href="/science"
+              href="/orders"
               className="hover:text-[#1F2421] transition-colors"
             >
-              Science
+              Orders
             </Link>
           </div>
 

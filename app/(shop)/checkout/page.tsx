@@ -9,7 +9,11 @@ import { Minus, Plus, Trash2, ShieldCheck, Truck, RotateCcw, Award, ArrowRight, 
 import { useCartStore } from '@/store/cartStore'
 import { formatNaira } from '@/lib/utils'
 import { loadPaystackScript } from '@/lib/paystack'
-import { createPendingOrder, verifyPaystackPayment } from '@/actions/orders'
+import { createOrder } from '@/actions/orders'
+
+function generateReference() {
+  return `HD_${Date.now()}_${Math.floor(Math.random() * 1000000)}`
+}
 
 const TAX_RATE = 0.075
 
@@ -75,44 +79,42 @@ export default function CheckoutPage() {
     setProcessing(true)
 
     try {
-      const orderResult = await createPendingOrder({
-        fullName: form.fullName,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        city: form.city,
-        state: form.state,
-        subtotal,
-        shipping,
-        tax,
-        total,
-      })
-
-      if ('error' in orderResult && orderResult.error) {
-        toast.error(orderResult.error)
-        return
-      }
-
       await loadPaystackScript()
+
+      const reference = generateReference()
 
       const handler = window.PaystackPop.setup({
         key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
         email: form.email,
         amount: Math.round(total * 100),
         currency: 'NGN',
-        ref: orderResult.reference!,
+        ref: reference,
         callback: (response) => {
-          verifyPaystackPayment(response.reference, orderResult.orderId!).then((result) => {
+          createOrder({
+            fullName: form.fullName,
+            email: form.email,
+            phone: form.phone,
+            address: form.address,
+            city: form.city,
+            state: form.state,
+            subtotal,
+            shipping,
+            tax,
+            total,
+            paymentReference: response.reference,
+          }).then((result) => {
             if ('error' in result && result.error) {
               toast.error(result.error)
+              setProcessing(false)
               return
             }
             toast.success('Payment successful!')
             init()
-            router.push('/orders')
+            router.push(`/order-confirmation/${result.orderId}`)
           })
         },
         onClose: () => {
+          setProcessing(false)
           toast.error('Checkout cancelled')
         },
       })
@@ -121,7 +123,6 @@ export default function CheckoutPage() {
     } catch (err) {
       console.error('Checkout error:', err)
       toast.error('Something went wrong starting checkout')
-    } finally {
       setProcessing(false)
     }
   }

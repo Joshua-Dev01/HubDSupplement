@@ -67,7 +67,7 @@ export default function OrdersPage() {
 
   return (
     <div className="bg-[#F7F5F0] min-h-screen pt-32 pb-24">
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="px-6">
         <h1 className="text-2xl font-bold text-[#1F2421] mb-8">Order History</h1>
 
         {loading ? (

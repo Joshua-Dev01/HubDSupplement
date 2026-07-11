@@ -1,19 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { sendOrderEmails } from '@/actions/email'
 
-export async function createPendingOrder({
-  fullName,
-  email,
-  phone,
-  address,
-  city,
-  state,
-  subtotal,
-  shipping,
-  tax,
-  total,
-}: {
+type CheckoutData = {
   fullName: string
   email: string
   phone: string
@@ -24,64 +14,62 @@ export async function createPendingOrder({
   shipping: number
   tax: number
   total: number
-}) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) return { error: 'not_authenticated' }
-
-  const reference = `order_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
-
-  const { data, error } = await supabase
-    .from('orders')
-    .insert({
-      user_id: user.id,
-      status: 'pending',
-      full_name: fullName,
-      email,
-      phone,
-      address,
-      city,
-      state,
-      subtotal,
-      shipping,
-      tax,
-      total,
-      paystack_reference: reference,
-    })
-    .select()
-    .single()
-
-  if (error) return { error: error.message }
-
-  return { orderId: data.id as string, reference }
+  paymentReference: string
 }
 
-export async function verifyPaystackPayment(reference: string, orderId: string) {
+export async function verifyPayment(reference: string) {
+  const response = await fetch(
+    `https://api.paystack.co/transaction/verify/${reference}`,
+    { headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` } }
+  )
+  return response.json()
+}
+
+export async function createOrder(data: CheckoutData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) return { error: 'not_authenticated' }
+  if (!user) return { error: 'Not logged in' }
 
-  const verifyRes = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
-    headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
-  })
-  const verifyData = await verifyRes.json()
-
-  if (!verifyRes.ok || verifyData?.data?.status !== 'success') {
-    await supabase.from('orders').update({ status: 'failed' }).eq('id', orderId)
+  // Re-verify server-side — never trust the client-side Paystack callback alone
+  const verification = await verifyPayment(data.paymentReference)
+  if (verification?.data?.status !== 'success') {
     return { error: 'Payment verification failed' }
   }
 
+  // Cart items come from the DB, not the client — prevents price tampering
   const { data: cartItems, error: cartError } = await supabase
     .from('cart_items')
     .select('product_id, quantity, product:products(id, name, price, images)')
     .eq('user_id', user.id)
 
   if (cartError) return { error: cartError.message }
+  if (!cartItems || cartItems.length === 0) return { error: 'Your cart is empty' }
 
-  const orderItems = (cartItems ?? []).map((item: any) => ({
-    order_id: orderId,
+  const { data: order, error } = await supabase
+    .from('orders')
+    .insert({
+      user_id: user.id,
+      email: data.email,
+      full_name: data.fullName,
+      phone: data.phone,
+      address: data.address,
+      city: data.city,
+      state: data.state,
+      status: 'paid',
+      payment_reference: data.paymentReference,
+      subtotal: data.subtotal,
+      shipping_fee: data.shipping,
+      tax: data.tax,
+      total: data.total,
+    })
+    .select()
+    .single()
+
+  if (error || !order) return { error: error?.message ?? 'Failed to create order' }
+
+  const orderItems = cartItems.map((item: any) => ({
+    order_id: order.id,
     product_id: item.product_id,
     product_name: item.product.name,
     product_image: item.product.images?.[0] ?? null,
@@ -89,15 +77,33 @@ export async function verifyPaystackPayment(reference: string, orderId: string) 
     quantity: item.quantity,
   }))
 
-  if (orderItems.length > 0) {
-    const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
-    if (itemsError) return { error: itemsError.message }
-  }
+  const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+  if (itemsError) return { error: itemsError.message }
 
-  await supabase.from('orders').update({ status: 'paid' }).eq('id', orderId)
+  // Send receipt + admin notification — don't block order success if email fails
+  await sendOrderEmails({
+    id: order.id,
+    full_name: order.full_name,
+    email: order.email,
+    phone: order.phone,
+    address: order.address,
+    city: order.city,
+    state: order.state,
+    subtotal: order.subtotal,
+    shipping_fee: order.shipping_fee,
+    tax: order.tax,
+    total: order.total,
+    created_at: order.created_at,
+    items: cartItems.map((item: any) => ({
+      product_name: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+    })),
+  })
+
   await supabase.from('cart_items').delete().eq('user_id', user.id)
 
-  return { success: true }
+  return { success: true, orderId: order.id as string }
 }
 
 export async function getOrders() {
