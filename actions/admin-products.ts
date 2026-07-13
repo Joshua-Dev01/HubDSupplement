@@ -1,16 +1,16 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
+import { cookies } from 'next/headers'
+import { getExpectedAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
+
 async function verifyAdmin() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email !== process.env.ADMIN_EMAIL) {
-    return false
-  }
-  return true
+  const cookieStore = await cookies()
+  const adminCookie = cookieStore.get(ADMIN_COOKIE_NAME)?.value
+  const expectedToken = await getExpectedAdminToken()
+  return adminCookie === expectedToken
 }
 
 export async function getAllProducts() {

@@ -3,12 +3,12 @@
 import { cookies } from 'next/headers'
 import { getExpectedAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 
-export async function adminLogin(password: string) {
-  if (!process.env.ADMIN_PASSWORD) {
+export async function adminLogin(email: string, password: string) {
+  if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
     return { error: 'Admin login is not configured' }
   }
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return { error: 'Incorrect password' }
+  if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+    return { error: 'Incorrect email or password' }
   }
 
   const token = await getExpectedAdminToken()

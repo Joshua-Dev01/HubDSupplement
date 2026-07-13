@@ -10,6 +10,7 @@ async function sha256(input: string): Promise<string> {
 
 export async function getExpectedAdminToken(): Promise<string> {
   const secret = process.env.ADMIN_SESSION_SECRET ?? ''
+  const email = process.env.ADMIN_EMAIL ?? ''
   const password = process.env.ADMIN_PASSWORD ?? ''
-  return sha256(`${password}:${secret}`)
+  return sha256(`${email}:${password}:${secret}`)
 }
