@@ -1,8 +1,25 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getExpectedAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
+
+  // Admin routes: fully separate auth system, no Supabase involved at all
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    if (request.nextUrl.pathname === '/admin/login') {
+      return NextResponse.next({ request })
+    }
+
+    const adminCookie = request.cookies.get(ADMIN_COOKIE_NAME)?.value
+    const expectedToken = await getExpectedAdminToken()
+
+    if (!adminCookie || adminCookie !== expectedToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+
+    return NextResponse.next({ request })
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,19 +43,6 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
-  // Admin routes get a stricter check: must be logged in AND match ADMIN_EMAIL
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!user) {
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('redirectTo', request.nextUrl.pathname)
-      return NextResponse.redirect(loginUrl)
-    }
-    if (user.email !== process.env.ADMIN_EMAIL) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-    return supabaseResponse
-  }
 
   const protectedRoutes = ['/account', '/checkout']
   const isProtected = protectedRoutes.some(route =>
