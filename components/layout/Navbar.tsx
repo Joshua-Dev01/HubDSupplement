@@ -69,9 +69,9 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8 text-sm text-[#3F4744]">
-            <Link href="/" className="font-medium text-[#1F2421]">
+            {/* <Link href="/" className="font-medium text-[#1F2421]">
               Home
-            </Link>
+            </Link> */}
             <Link
               href="/shop"
               className="hover:text-[#1F2421] transition-colors"
@@ -83,6 +83,18 @@ export default function Navbar() {
               className="hover:text-[#1F2421] transition-colors"
             >
               Orders
+            </Link>
+             <Link
+              href="/about"
+              className="hover:text-[#1F2421] transition-colors"
+            >
+              About
+            </Link>
+             <Link
+              href="/contact"
+              className="hover:text-[#1F2421] transition-colors"
+            >
+              Contact
             </Link>
           </div>
 
