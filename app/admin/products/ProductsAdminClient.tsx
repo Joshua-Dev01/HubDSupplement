@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, X, Loader2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Loader2, AlertTriangle } from 'lucide-react'
 import { createProduct, updateProduct, deleteProduct } from '@/actions/admin-products'
 import { formatNaira } from '@/lib/utils'
 import { CATEGORIES } from '@/lib/constants'
@@ -26,6 +26,8 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   function openCreate() {
     setForm(EMPTY_FORM)
@@ -83,16 +85,26 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
     window.location.reload() // simplest way to refresh server-fetched list
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+  function askDelete(id: string, name: string) {
+    setDeleteTarget({ id, name })
+  }
 
-    const result = await deleteProduct(id)
+  async function confirmDelete() {
+    if (!deleteTarget) return
+    setDeleting(true)
+
+    const result = await deleteProduct(deleteTarget.id)
+
+    setDeleting(false)
+
     if (result.error) {
       toast.error(result.error)
       return
     }
-    setProducts((prev) => prev.filter((p) => p.id !== id))
+
+    setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id))
     toast.success('Product deleted')
+    setDeleteTarget(null)
   }
 
   const inputClass = "w-full bg-[#EFEDE6] border-none rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#5F7A5B] transition-all"
@@ -148,7 +160,7 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
                     <button onClick={() => openEdit(product)} className="p-2 text-[#8A928E] hover:text-[#5F7A5B] transition-colors">
                       <Pencil size={15} />
                     </button>
-                    <button onClick={() => handleDelete(product.id, product.name)} className="p-2 text-[#8A928E] hover:text-red-500 transition-colors">
+                    <button onClick={() => askDelete(product.id, product.name)} className="p-2 text-[#8A928E] hover:text-red-500 transition-colors">
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -229,6 +241,42 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
               >
                 {saving && <Loader2 size={15} className="animate-spin" />}
                 {saving ? 'Saving...' : editingId ? 'Save Changes' : 'Create Product'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-500 mb-5 mx-auto">
+              <AlertTriangle size={20} />
+            </div>
+
+            <h2 className="text-lg font-bold text-[#1F2421] text-center mb-2">
+              Delete this product?
+            </h2>
+            <p className="text-sm text-[#8A928E] text-center mb-6">
+              <span className="font-medium text-[#3F4744]">&rdquo;{deleteTarget.name}&rdquo;</span> will be
+              permanently removed. This cannot be undone.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="flex-1 border border-black/10 text-[#3F4744] font-medium py-2.5 rounded-full transition-colors hover:bg-[#F7F5F0] disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting}
+                className="flex-1 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-medium py-2.5 rounded-full transition-colors"
+              >
+                {deleting && <Loader2 size={15} className="animate-spin" />}
+                {deleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>

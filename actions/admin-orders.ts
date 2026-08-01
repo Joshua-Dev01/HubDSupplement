@@ -39,6 +39,20 @@ export async function updateOrderStatus(orderId: string, status: string) {
   return { success: true };
 }
 
+export async function updateOrderTracking(orderId: string, trackingNumber: string) {
+  if (!(await verifyAdmin())) return { error: "Unauthorized" };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("orders")
+    .update({ tracking_number: trackingNumber })
+    .eq("id", orderId);
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/orders");
+  return { success: true };
+}
+
 export async function getDashboardStats() {
   if (!(await verifyAdmin())) return null;
 

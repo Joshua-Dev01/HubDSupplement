@@ -152,7 +152,7 @@ export default function AdminOverviewPage() {
                 tick={{ fontSize: 11, fill: "#8A928E" }}
                 tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`}
               />
-              <Tooltip formatter={(value: number) => formatNaira(value)} />
+              <Tooltip formatter={(value) => (typeof value === "number" ? formatNaira(value) : "")} />
               <Line
                 type="monotone"
                 dataKey="revenue"
