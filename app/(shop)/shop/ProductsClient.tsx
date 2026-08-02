@@ -3,13 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { SlidersHorizontal, Loader2 } from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
-import { useCartStore } from '@/store/cartStore'
-import type { Product } from '@/types/product'
+import { SlidersHorizontal } from 'lucide-react'
 import { FaCartPlus } from 'react-icons/fa'
+import type { Product } from '@/types/product'
 
 const TABS = ['All', ...CATEGORIES.map((c) => c.label)]
 const LABEL_TO_VALUE: Record<string, string> = Object.fromEntries(
@@ -17,38 +14,6 @@ const LABEL_TO_VALUE: Record<string, string> = Object.fromEntries(
 )
 
 function ProductCard({ product }: { product: Product }) {
-  const [added, setAdded] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const addItem = useCartStore((s) => s.addItem)
-  const router = useRouter()
-
-  async function handleQuickAdd(e: React.MouseEvent) {
-    console.log('🔵 Quick Add clicked! product.id =', product.id)
-    e.preventDefault()
-    setLoading(true)
-
-    try {
-      const result = await addItem(product.id)
-      console.log('🔵 addItem result:', result)
-
-      if (result.error === 'not_authenticated') {
-        toast.error('Please log in to add items to your cart')
-        router.push('/login')
-        return
-      }
-      if (result.error) {
-        toast.error(result.error)
-        return
-      }
-
-      setAdded(true)
-      toast.success('Added to cart')
-      setTimeout(() => setAdded(false), 1500)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const image = product.images?.[0] ?? 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=600&q=80'
   const isSoldOut = product.in_stock === false
 
@@ -64,15 +29,16 @@ function ProductCard({ product }: { product: Product }) {
           <span className="absolute top-3 right-3 bg-gray-400 text-white text-[10px] uppercase tracking-wider px-2 py-1 rounded-full">Sold Out</span>
         )}
 
-        <button
-          onClick={handleQuickAdd}
-          disabled={loading || isSoldOut}
-          className={`absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 ${
-            added ? 'bg-green-600 text-white' : 'bg-[#5F7A5B] cursor-pointer  hover:bg-[#5F7A5B] text-white'
+        {/* Purely visual now — no click interception, so it navigates
+            to the product page like the rest of the card, where the
+            real Add to Cart / subscribe choice happens. */}
+        <span
+          className={`absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+            isSoldOut ? 'bg-gray-300 text-white' : 'bg-[#5F7A5B] text-white group-hover:bg-[#4F6A4B]'
           }`}
         >
-          {loading ? <Loader2 size={14} className="animate-spin" /> : <FaCartPlus size={14} />}
-        </button>
+          <FaCartPlus size={14} />
+        </span>
       </div>
 
       <p className="text-[11px] uppercase tracking-widest text-[#8A928E] mb-1">{product.category}</p>

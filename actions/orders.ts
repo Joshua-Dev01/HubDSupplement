@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendOrderEmails } from '@/actions/email'
 
 type CheckoutData = {
@@ -25,31 +26,33 @@ export async function verifyPayment(reference: string) {
   return response.json()
 }
 
-export async function createOrder(data: CheckoutData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+// Shared by both the client-side callback path and the webhook path,
+// so an order is only ever created once per reference, from one place.
+async function createOrderFromVerifiedPayment(userId: string, data: CheckoutData) {
+  const admin = createAdminClient()
 
-  if (!user) return { error: 'Not logged in' }
+  // Guard against duplicate creation if both the browser callback and
+  // the webhook fire for the same payment.
+  const { data: existing } = await admin
+    .from('orders')
+    .select('id')
+    .eq('payment_reference', data.paymentReference)
+    .maybeSingle()
 
-  // Re-verify server-side — never trust the client-side Paystack callback alone
-  const verification = await verifyPayment(data.paymentReference)
-  if (verification?.data?.status !== 'success') {
-    return { error: 'Payment verification failed' }
-  }
+  if (existing) return { success: true, orderId: existing.id as string }
 
-  // Cart items come from the DB, not the client — prevents price tampering
-  const { data: cartItems, error: cartError } = await supabase
+  const { data: cartItems, error: cartError } = await admin
     .from('cart_items')
     .select('product_id, quantity, product:products(id, name, price, images)')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
 
   if (cartError) return { error: cartError.message }
-  if (!cartItems || cartItems.length === 0) return { error: 'Your cart is empty' }
+  if (!cartItems || cartItems.length === 0) return { error: 'Cart was empty at time of order creation' }
 
-  const { data: order, error } = await supabase
+  const { data: order, error } = await admin
     .from('orders')
     .insert({
-      user_id: user.id,
+      user_id: userId,
       email: data.email,
       full_name: data.fullName,
       phone: data.phone,
@@ -77,10 +80,9 @@ export async function createOrder(data: CheckoutData) {
     quantity: item.quantity,
   }))
 
-  const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+  const { error: itemsError } = await admin.from('order_items').insert(orderItems)
   if (itemsError) return { error: itemsError.message }
 
-  // Send receipt + admin notification — don't block order success if email fails
   await sendOrderEmails({
     id: order.id,
     full_name: order.full_name,
@@ -102,10 +104,28 @@ export async function createOrder(data: CheckoutData) {
     })),
   })
 
-  await supabase.from('cart_items').delete().eq('user_id', user.id)
+  await admin.from('cart_items').delete().eq('user_id', userId)
 
   return { success: true, orderId: order.id as string }
 }
+
+// Called from the checkout page after Paystack's popup callback fires.
+export async function createOrder(data: CheckoutData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not logged in' }
+
+  const verification = await verifyPayment(data.paymentReference)
+  if (verification?.data?.status !== 'success') {
+    return { error: 'Payment verification failed' }
+  }
+
+  return createOrderFromVerifiedPayment(user.id, data)
+}
+
+// Called from the webhook route — same logic, reused, exported for that route to use.
+export { createOrderFromVerifiedPayment }
 
 export async function getOrders() {
   const supabase = await createClient()

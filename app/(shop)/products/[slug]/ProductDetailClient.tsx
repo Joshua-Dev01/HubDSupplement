@@ -13,7 +13,6 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=800&q=80',
   ]
   const [activeImage, setActiveImage] = useState(0)
-  const [plan, setPlan] = useState<'subscribe' | 'onetime'>('subscribe')
   const [loading, setLoading] = useState(false)
   const addItem = useCartStore((s) => s.addItem)
   const router = useRouter()
@@ -21,8 +20,6 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const rating = product.rating ?? 4.8
   const reviewCount = product.review_count ?? 0
   const supplyDays = product.supply_days ?? 30
-  const discountPct = product.subscription_discount_pct ?? 15
-  const subscribePrice = product.price * (1 - discountPct / 100)
   const isSoldOut = product.in_stock === false
 
   async function handleAddToCart() {
@@ -110,43 +107,6 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         {product.description && (
           <p className="text-sm text-[#3F4744] leading-relaxed mb-8 max-w-md">{product.description}</p>
         )}
-
-        {/* Subscription toggle */}
-        <div className="border border-black/10 rounded-2xl overflow-hidden mb-6">
-          <div className="flex items-center justify-between px-5 py-3 bg-[#EFEDE6] text-xs font-medium text-[#1F2421]">
-            <span>Subscription</span>
-            <span className="text-[#5F7A5B]">Save {discountPct}%</span>
-          </div>
-
-          <label className="flex items-center justify-between px-5 py-4 border-b border-black/5 cursor-pointer hover:bg-[#F7F5F0] transition-colors">
-            <div className="flex items-center gap-3">
-              <input
-                type="radio"
-                checked={plan === 'subscribe'}
-                onChange={() => setPlan('subscribe')}
-                className="accent-[#5F7A5B] w-4 h-4"
-              />
-              <div>
-                <p className="text-sm font-medium text-[#1F2421]">Subscribe & Save</p>
-                <p className="text-xs text-[#8A928E]">Delivered every {supplyDays} days. Cancel anytime.</p>
-              </div>
-            </div>
-            <span className="text-sm font-bold text-[#1F2421]">${subscribePrice.toFixed(2)}</span>
-          </label>
-
-          <label className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-[#F7F5F0] transition-colors">
-            <div className="flex items-center gap-3">
-              <input
-                type="radio"
-                checked={plan === 'onetime'}
-                onChange={() => setPlan('onetime')}
-                className="accent-[#5F7A5B] w-4 h-4"
-              />
-              <p className="text-sm font-medium text-[#1F2421]">One-time Purchase</p>
-            </div>
-            <span className="text-sm font-bold text-[#1F2421]">${product.price.toFixed(2)}</span>
-          </label>
-        </div>
 
         <button
           onClick={handleAddToCart}
