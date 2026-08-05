@@ -1,40 +1,40 @@
-// declare global {
-//   interface Window {
-//     PaystackPop: {
-//       setup: (options: {
-//         key: string
-//         email: string
-//         amount: number
-//         currency: string
-//         ref: string
-//         channels?: string[]
-//         metadata?: Record<string, unknown>
-//         callback: (response: { reference: string }) => void
-//         onClose: () => void
-//       }) => { openIframe: () => void }
-//     }
-//   }
-// }
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup: (options: {
+        key: string
+        email: string
+        amount: number
+        currency: string
+        ref: string
+        channels?: string[]
+        metadata?: Record<string, unknown>
+        callback: (response: { reference: string }) => void
+        onClose: () => void
+      }) => { openIframe: () => void }
+    }
+  }
+}
 
-// let scriptPromise: Promise<void> | null = null
+let scriptPromise: Promise<void> | null = null
 
-// export function loadPaystackScript(): Promise<void> {
-//   if (typeof window === 'undefined') return Promise.resolve()
-//   if (window.PaystackPop) return Promise.resolve()
-//   if (scriptPromise) return scriptPromise
+export function loadPaystackScript(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve()
+  if (window.PaystackPop) return Promise.resolve()
+  if (scriptPromise) return scriptPromise
 
-//   scriptPromise = new Promise((resolve, reject) => {
-//     const script = document.createElement('script')
-//     script.src = 'https://js.paystack.co/v1/inline.js'
-//     script.async = true
-//     script.onload = () => resolve()
-//     script.onerror = () => reject(new Error('Failed to load Paystack script'))
-//     document.body.appendChild(script)
-//   })
+  scriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://js.paystack.co/v1/inline.js'
+    script.async = true
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load Paystack script'))
+    document.body.appendChild(script)
+  })
 
-//   return scriptPromise
-// }
+  return scriptPromise
+}
 
-// export function generatePaymentReference() {
-//   return `HD_${Date.now()}_${Math.floor(Math.random() * 1000000)}`
-// }
+export function generatePaymentReference() {
+  return `HD_${Date.now()}_${Math.floor(Math.random() * 1000000)}`
+}

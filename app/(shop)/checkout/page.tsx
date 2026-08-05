@@ -20,13 +20,14 @@ declare global {
   interface Window {
     PaystackPop: {
       setup: (options: {
-        key: string | undefined
+        key: string
         email: string
         amount: number
         currency: string
         ref: string
-        metadata: Record<string, unknown>
-        callback: (response: PaystackResponse) => void
+        channels?: string[]
+        metadata?: Record<string, unknown>
+        callback: (response: { reference: string }) => void
         onClose: () => void
       }) => { openIframe: () => void }
     }
@@ -156,8 +157,11 @@ export default function CheckoutPage() {
         email: form.email,
         amount: Math.round(total * 100),
         currency: 'NGN',
+        channels: ['card', 'bank', 'ussd', 'bank_transfer', 'mobile_money'],
         ref: reference,
-        // channels omitted — let Paystack show all enabled methods on the dashboard
+        // Passed through to Paystack, and included on the webhook event —
+        // this is what lets the webhook create the order even if this
+        // browser tab never gets to run the callback below.
         metadata: {
           user_id: authUserId,
           full_name: form.fullName,

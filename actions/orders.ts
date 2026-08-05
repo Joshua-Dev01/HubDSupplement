@@ -18,6 +18,18 @@ type CheckoutData = {
   paymentReference: string
 }
 
+// Shape returned by the cart_items query below, joined with its product row.
+type CartItemWithProduct = {
+  product_id: string
+  quantity: number
+  product: {
+    id: string
+    name: string
+    price: number
+    images: string[] | null
+  }
+}
+
 export async function verifyPayment(reference: string) {
   const response = await fetch(
     `https://api.paystack.co/transaction/verify/${reference}`,
@@ -41,13 +53,15 @@ async function createOrderFromVerifiedPayment(userId: string, data: CheckoutData
 
   if (existing) return { success: true, orderId: existing.id as string }
 
-  const { data: cartItems, error: cartError } = await admin
+  const { data: cartItemsData, error: cartError } = await admin
     .from('cart_items')
     .select('product_id, quantity, product:products(id, name, price, images)')
     .eq('user_id', userId)
 
   if (cartError) return { error: cartError.message }
-  if (!cartItems || cartItems.length === 0) return { error: 'Cart was empty at time of order creation' }
+  if (!cartItemsData || cartItemsData.length === 0) return { error: 'Cart was empty at time of order creation' }
+
+  const cartItems = cartItemsData as unknown as CartItemWithProduct[]
 
   const { data: order, error } = await admin
     .from('orders')
@@ -71,7 +85,7 @@ async function createOrderFromVerifiedPayment(userId: string, data: CheckoutData
 
   if (error || !order) return { error: error?.message ?? 'Failed to create order' }
 
-  const orderItems = cartItems.map((item: any) => ({
+  const orderItems = cartItems.map((item) => ({
     order_id: order.id,
     product_id: item.product_id,
     product_name: item.product.name,
@@ -96,7 +110,7 @@ async function createOrderFromVerifiedPayment(userId: string, data: CheckoutData
     tax: order.tax,
     total: order.total,
     created_at: order.created_at,
-    items: cartItems.map((item: any) => ({
+    items: cartItems.map((item) => ({
       product_name: item.product.name,
       product_image: item.product.images?.[0] ?? null,
       quantity: item.quantity,
