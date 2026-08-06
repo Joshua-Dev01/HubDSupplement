@@ -69,7 +69,7 @@ export default function AdminAnalyticsPage() {
             <CartesianGrid strokeDasharray="3 3" stroke="#EFEDE6" />
             <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#8A928E' }} interval={Math.floor(data.aovBuckets.length / 6)} />
             <YAxis tick={{ fontSize: 11, fill: '#8A928E' }} tickFormatter={(v) => `₦${v}`} />
-            <Tooltip formatter={(value: number) => formatNaira(value)} />
+            <Tooltip formatter={(value) => formatNaira(Number(value))} />
             <Line
               type="monotone"
               dataKey="aov"
