@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Star, Loader2 } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 type Review = {
@@ -10,6 +10,25 @@ type Review = {
   customer_title: string | null
   rating: number
   body: string
+}
+
+function TestimonialSkeleton() {
+  return (
+    <div className="bg-[#EFEDE6] rounded-2xl p-6 animate-pulse">
+      <div className="flex gap-1 mb-4">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="w-3.5 h-3.5 rounded-sm bg-black/10" />
+        ))}
+      </div>
+      <div className="space-y-2 mb-6">
+        <div className="h-3 bg-black/10 rounded-full w-full" />
+        <div className="h-3 bg-black/10 rounded-full w-full" />
+        <div className="h-3 bg-black/10 rounded-full w-2/3" />
+      </div>
+      <div className="h-3.5 bg-black/10 rounded-full w-24 mb-2" />
+      <div className="h-3 bg-black/10 rounded-full w-32" />
+    </div>
+  )
 }
 
 export default function Testimonials() {
@@ -59,8 +78,14 @@ export default function Testimonials() {
 
   if (loading) {
     return (
-      <section className="max-w-7xl mx-auto px-6 py-20 flex justify-center text-[#8A928E]">
-        <Loader2 size={20} className="animate-spin" />
+      <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div>
+          <div className="h-7 bg-black/10 rounded-full w-3/4 mb-3 animate-pulse" />
+          <div className="h-3 bg-black/10 rounded-full w-full mb-2 animate-pulse" />
+          <div className="h-3 bg-black/10 rounded-full w-5/6 animate-pulse" />
+        </div>
+        <TestimonialSkeleton />
+        <TestimonialSkeleton />
       </section>
     )
   }
