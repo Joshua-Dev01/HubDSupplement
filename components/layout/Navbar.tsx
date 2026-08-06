@@ -128,7 +128,7 @@ export default function Navbar() {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileMenuOpen((v) => !v)}
-              className="md:hidden text-[#1F2421]"
+              className="md:hidden text-[#1F2421] cursor-pointer"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -141,26 +141,29 @@ export default function Navbar() {
             <SearchBar />
             <div className="flex flex-col gap-4 text-sm">
               <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="font-medium text-[#1F2421]"
-              >
-                Home
-              </Link>
-              <Link
-                href="/shop"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-[#3F4744]"
-              >
-                Shop All
-              </Link>
-              <Link
-                href="/science"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-[#3F4744]"
-              >
-                Science
-              </Link>
+              href="/shop"
+              className="hover:text-[#1F2421] transition-colors"
+            >
+              Products
+            </Link>
+            <Link
+              href="/orders"
+              className="hover:text-[#1F2421] transition-colors"
+            >
+              Orders
+            </Link>
+             <Link
+              href="/about"
+              className="hover:text-[#1F2421] transition-colors"
+            >
+              About
+            </Link>
+             <Link
+              href="/contact"
+              className="hover:text-[#1F2421] transition-colors"
+            >
+              Contact
+            </Link>
             </div>
           </div>
         )}
