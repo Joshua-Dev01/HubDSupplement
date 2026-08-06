@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import {
-
+  ShoppingBag,
   User,
   X,
   Menu,
@@ -28,6 +28,13 @@ const DRAWER_LINKS = [
   { label: "Bundles", href: "/bundles", icon: Package },
   { label: "Science", href: "/science", icon: FlaskConical },
   { label: "About", href: "/about", icon: Info },
+];
+
+const NAV_LINKS = [
+  { label: "Products", href: "/shop" },
+  { label: "Orders", href: "/orders" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -58,54 +65,37 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-40 bg-[#F7F5F0]/95 backdrop-blur border-b border-black/5 py-4">
-        <div className="max-w-7xl mx-auto px-2 flex items-center justify-between gap-6">
-          <Link href="/" className="flex items-center">
+      <nav className="fixed top-0 left-0 w-full z-40 bg-[#F7F5F0]/95 backdrop-blur border-b border-black/5 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-6">
+          <Link href="/" className="flex items-center shrink-0">
             <img
               src="/images/logo1.png"
               alt={SITE.name ?? "Logo"}
-              className="h-14 w-auto object-contain md:h-20"
+              className="h-10 w-auto object-contain sm:h-14 lg:h-16"
             />
           </Link>
 
-          <div className="hidden md:flex items-center gap-8 text-sm text-[#3F4744]">
-            {/* <Link href="/" className="font-medium text-[#1F2421]">
-              Home
-            </Link> */}
-            <Link
-              href="/shop"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              Products
-            </Link>
-            <Link
-              href="/orders"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              Orders
-            </Link>
-             <Link
-              href="/about"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              About
-            </Link>
-             <Link
-              href="/contact"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              Contact
-            </Link>
+          <div className="hidden lg:flex items-center gap-7 text-sm text-[#3F4744] shrink-0">
+            {NAV_LINKS.map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="hover:text-[#1F2421] transition-colors whitespace-nowrap"
+              >
+                {label}
+              </Link>
+            ))}
           </div>
 
-          <SearchBar className="hidden md:block flex-1 max-w-xs" />
+          <SearchBar className="hidden lg:block flex-1 max-w-xs" />
 
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <Link
               href="/cart"
               className="relative text-[#1F2421] hover:opacity-70 transition-opacity"
             >
-              <FaCartPlus size={19} />
+              <FaCartPlus size={18} className="sm:hidden" />
+              <FaCartPlus size={19} className="hidden sm:block" />
               <span className="absolute -top-2 -right-2 bg-[#e61c1c] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                 {cartCount}
               </span>
@@ -117,53 +107,54 @@ export default function Navbar() {
               className="text-[#1F2421] cursor-pointer hover:opacity-70 transition-opacity"
             >
               {user ? (
-                <span className="w-8 h-8 rounded-full bg-[#5F7A5B] text-white text-xs font-bold flex items-center justify-center">
+                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#5F7A5B] text-white text-xs font-bold flex items-center justify-center">
                   {initial}
                 </span>
               ) : (
-                <User size={19} />
+                <User size={18} className="sm:hidden" />
               )}
+              {!user && <User size={19} className="hidden sm:block" />}
             </button>
 
-            {/* Mobile hamburger */}
+            {/* Hamburger — visible below the lg breakpoint, matching where nav links/search hide */}
             <button
               onClick={() => setMobileMenuOpen((v) => !v)}
-              className="md:hidden text-[#1F2421] cursor-pointer"
+              className="lg:hidden text-[#1F2421]"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile slide-down menu */}
+        {/* Mobile / tablet slide-down menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden px-6 pt-4 pb-6 flex flex-col gap-5 border-t border-black/5 mt-4 bg-[#F7F5F0]">
+          <div className="lg:hidden px-4 sm:px-6 pt-4 pb-6 flex flex-col gap-5 border-t border-black/5 mt-3 sm:mt-4 bg-[#F7F5F0]">
             <SearchBar />
             <div className="flex flex-col gap-4 text-sm">
-              <Link
-              href="/shop"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              Products
-            </Link>
-            <Link
-              href="/orders"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              Orders
-            </Link>
-             <Link
-              href="/about"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              About
-            </Link>
-             <Link
-              href="/contact"
-              className="hover:text-[#1F2421] transition-colors"
-            >
-              Contact
-            </Link>
+              {/* <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className="font-medium text-[#1F2421]"
+              >
+                Home
+              </Link> */}
+              {NAV_LINKS.map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-[#3F4744]"
+                >
+                  {label}
+                </Link>
+              ))}
+              {/* <Link
+                href="/science"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#3F4744]"
+              >
+                Science
+              </Link> */}
             </div>
           </div>
         )}
