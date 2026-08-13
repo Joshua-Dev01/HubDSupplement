@@ -3,11 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { ChevronLeft, ChevronRight, Loader2, ArrowRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { useCartStore } from '@/store/cartStore'
 import { formatNaira } from '@/lib/utils'
 import type { Product } from '@/types/product'
 import { FaCartPlus } from 'react-icons/fa'
@@ -37,10 +34,7 @@ function ProductSkeleton() {
 export default function BestSellers() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [addingId, setAddingId] = useState<string | null>(null)
   const [startIndex, setStartIndex] = useState(0)
-  const addItem = useCartStore((s) => s.addItem)
-  const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
@@ -82,27 +76,6 @@ export default function BestSellers() {
       supabase.removeChannel(channel)
     }
   }, [])
-
-  async function handleAddToCart(productId: string) {
-    setAddingId(productId)
-    try {
-      const result = await addItem(productId)
-
-      if (result.error === 'not_authenticated') {
-        toast.error('Please log in to add items to your cart')
-        router.push('/login')
-        return
-      }
-      if (result.error) {
-        toast.error(result.error)
-        return
-      }
-
-      toast.success('Added to cart')
-    } finally {
-      setAddingId(null)
-    }
-  }
 
   const visibleProducts = products.slice(startIndex, startIndex + VISIBLE_COUNT)
   const canGoBack = startIndex > 0
@@ -167,7 +140,6 @@ export default function BestSellers() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {visibleProducts.map((p) => {
           const image = p.images?.[0] ?? 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=600&q=80'
-          const isAdding = addingId === p.id
 
           return (
             <div key={p.id} className="bg-white rounded-2xl overflow-hidden border border-black/5">
@@ -185,13 +157,12 @@ export default function BestSellers() {
                 <p className="text-xs text-[#8A928E] leading-relaxed mb-4 line-clamp-2">{p.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#1F2421]">{formatNaira(p.price)}</span>
-                  <button
-                    onClick={() => handleAddToCart(p.id)}
-                    disabled={isAdding}
-                    className="w-9 h-9 rounded-full bg-[#F7F5F0] flex cursor-pointer items-center justify-center hover:bg-[#5F7A5B] hover:text-white transition-colors disabled:opacity-50"
+                  <Link
+                    href={`/products/${p.slug}`}
+                    className="w-9 h-9 rounded-full bg-[#F7F5F0] flex items-center justify-center hover:bg-[#5F7A5B] hover:text-white transition-colors"
                   >
-                    {isAdding ? <Loader2 size={14} className="animate-spin" /> : <FaCartPlus size={14} />}
-                  </button>
+                    <FaCartPlus size={14} />
+                  </Link>
                 </div>
               </div>
             </div>

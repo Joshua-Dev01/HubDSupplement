@@ -100,7 +100,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </div>
 
         <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-3xl font-bold text-[#1F2421]">${product.price.toFixed(2)}</span>
+          <span className="text-3xl font-bold text-[#1F2421]">₦{product.price.toFixed(2)}</span>
           <span className="text-sm text-[#8A928E]">/ {supplyDays}-Day Supply</span>
         </div>
 
@@ -118,7 +118,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </button>
 
         <p className="text-xs text-[#8A928E] text-center">
-          Free shipping on orders over $75
+          Free shipping
         </p>
       </div>
     </div>
