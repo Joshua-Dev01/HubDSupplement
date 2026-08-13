@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Plus, Pencil, Trash2, X, Loader2, AlertTriangle } from 'lucide-react'
-import { createProduct, updateProduct, deleteProduct } from '@/actions/admin-products'
+import { Plus, Pencil, Trash2, X, Loader2, AlertTriangle, Upload } from 'lucide-react'
+import { createProduct, updateProduct, deleteProduct, uploadProductImage } from '@/actions/admin-products'
 import { formatNaira } from '@/lib/utils'
 import { CATEGORIES } from '@/lib/constants'
 import type { Product } from '@/types/product'
@@ -14,7 +14,7 @@ const EMPTY_FORM = {
   slug: '',
   price: '',
   category: 'vitamins',
-  images: '',
+  images: [] as string[],
   description: '',
   is_new: false,
   in_stock: true,
@@ -26,8 +26,10 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function openCreate() {
     setForm(EMPTY_FORM)
@@ -41,13 +43,46 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
       slug: product.slug,
       price: String(product.price),
       category: product.category,
-      images: (product.images ?? []).join(', '),
+      images: product.images ?? [],
       description: product.description ?? '',
       is_new: product.is_new,
       in_stock: product.in_stock,
     })
     setEditingId(product.id)
     setShowForm(true)
+  }
+
+  async function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setUploading(true)
+
+    const uploadedUrls: string[] = []
+
+    for (const file of Array.from(files)) {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const result = await uploadProductImage(formData)
+
+      if (result.error) {
+        toast.error(`${file.name}: ${result.error}`)
+        continue
+      }
+
+      if (result.url) uploadedUrls.push(result.url)
+    }
+
+    setForm((f) => ({ ...f, images: [...f.images, ...uploadedUrls] }))
+    setUploading(false)
+
+    // reset the input so selecting the same file again still fires onChange
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  function removeImage(url: string) {
+    setForm((f) => ({ ...f, images: f.images.filter((img) => img !== url) }))
   }
 
   async function handleSave() {
@@ -63,7 +98,7 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
       slug: form.slug,
       price: parseFloat(form.price),
       category: form.category,
-      images: form.images.split(',').map((s) => s.trim()).filter(Boolean),
+      images: form.images,
       description: form.description,
       is_new: form.is_new,
       in_stock: form.in_stock,
@@ -214,8 +249,51 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
               </div>
 
               <div>
-                <label className="text-xs uppercase tracking-widest text-[#8A928E] mb-1.5 block">Image URLs (comma-separated)</label>
-                <input value={form.images} onChange={(e) => setForm({ ...form, images: e.target.value })} className={inputClass} placeholder="https://..., https://..." />
+                <label className="text-xs uppercase tracking-widest text-[#8A928E] mb-1.5 block">Product Images</label>
+
+                {form.images.length > 0 && (
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {form.images.map((url) => (
+                      <div key={url} className="relative aspect-square rounded-lg overflow-hidden bg-[#EFEDE6] group">
+                        <Image src={url} alt="" fill className="object-cover" />
+                        <button
+                          onClick={() => removeImage(url)}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  onChange={handleFilesSelected}
+                  className="hidden"
+                  id="product-image-upload"
+                />
+                <label
+                  htmlFor="product-image-upload"
+                  className={`flex items-center justify-center gap-2 border-2 border-dashed border-black/10 rounded-xl py-6 text-sm text-[#8A928E] cursor-pointer hover:border-[#5F7A5B] hover:text-[#5F7A5B] transition-colors ${
+                    uploading ? 'pointer-events-none opacity-50' : ''
+                  }`}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={16} />
+                      Click to upload images
+                    </>
+                  )}
+                </label>
               </div>
 
               <div>
@@ -236,7 +314,7 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
 
               <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || uploading}
                 className="flex items-center justify-center gap-2 bg-[#5F7A5B] hover:bg-[#4F6A4B] disabled:opacity-50 text-white font-medium py-3 rounded-full transition-colors mt-2"
               >
                 {saving && <Loader2 size={15} className="animate-spin" />}
