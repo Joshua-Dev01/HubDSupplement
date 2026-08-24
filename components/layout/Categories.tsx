@@ -1,5 +1,18 @@
 import Link from 'next/link'
-import { Droplet, TrendingUp, Leaf, Moon, Shield, type LucideIcon } from 'lucide-react'
+import {
+  Droplet,
+  TrendingUp,
+  Leaf,
+  Moon,
+  Shield,
+  Venus,
+  Dumbbell,
+  HeartPulse,
+  Baby,
+  Sparkles,
+  Mars,
+  type LucideIcon,
+} from 'lucide-react'
 import { CATEGORIES } from '@/lib/constants'
 
 const ICONS: Record<string, LucideIcon> = {
@@ -8,6 +21,12 @@ const ICONS: Record<string, LucideIcon> = {
   leaf: Leaf,
   moon: Moon,
   shield: Shield,
+  venus: Venus,
+  dumbbell: Dumbbell,
+  'heart-pulse': HeartPulse,
+  baby: Baby,
+  sparkles: Sparkles,
+  mars: Mars,
 }
 
 export default function Categories() {

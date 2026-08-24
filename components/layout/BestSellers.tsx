@@ -11,26 +11,6 @@ import { FaCartPlus } from 'react-icons/fa'
 
 const VISIBLE_COUNT = 4
 
-function ProductSkeleton() {
-  return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-black/5 animate-pulse">
-      <div className="aspect-[4/3] bg-[#EFEDE6]" />
-      <div className="p-5">
-        <div className="h-2.5 bg-black/10 rounded-full w-16 mb-3" />
-        <div className="h-3.5 bg-black/10 rounded-full w-3/4 mb-3" />
-        <div className="space-y-2 mb-4">
-          <div className="h-2.5 bg-black/10 rounded-full w-full" />
-          <div className="h-2.5 bg-black/10 rounded-full w-2/3" />
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="h-4 bg-black/10 rounded-full w-16" />
-          <div className="w-9 h-9 rounded-full bg-black/10" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function BestSellers() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -82,21 +62,7 @@ export default function BestSellers() {
   const canGoForward = startIndex + VISIBLE_COUNT < products.length
 
   if (loading) {
-    return (
-      <section className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="flex items-end justify-between mb-8">
-          <div>
-            <div className="h-6 bg-black/10 rounded-full w-48 mb-3 animate-pulse" />
-            <div className="h-3 bg-black/10 rounded-full w-64 animate-pulse" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {Array.from({ length: VISIBLE_COUNT }).map((_, i) => (
-            <ProductSkeleton key={i} />
-          ))}
-        </div>
-      </section>
-    )
+    return null
   }
 
   if (products.length === 0) {

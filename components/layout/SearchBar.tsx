@@ -79,12 +79,12 @@ export default function SearchBar({ className = '' }: { className?: string }) {
             <p className="text-xs text-[#8A928E] text-center py-6">No products found</p>
           ) : (
             results.map((p) => (
-              <Link
-                key={p.id}
-                href={`/products/${p.slug}`}
-                onClick={() => { setOpen(false); setQuery('') }}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-[#F7F5F0] transition-colors"
-              >
+                <Link
+                  key={p.id}
+                  href={p.slug ? `/products/${p.slug}` : '/shop'}
+                  onClick={() => { setOpen(false); setQuery('') }}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-[#F7F5F0] transition-colors"
+                >
                 <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-[#EFEDE6] shrink-0">
                   {p.images?.[0] && <Image src={p.images[0]} alt={p.name} fill className="object-cover" />}
                 </div>

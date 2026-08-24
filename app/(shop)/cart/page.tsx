@@ -47,7 +47,7 @@ export default function CartPage() {
             <div className="lg:col-span-8 flex flex-col gap-4">
               {items.map((item) => (
                 <div key={item.id} className="bg-white rounded-2xl p-6 flex gap-6">
-                  <Link href={`/products/${item.product.slug}`} className="relative w-28 h-28 bg-[#EFEDE6] rounded-xl overflow-hidden shrink-0">
+                  <Link href={item.product?.slug ? `/products/${item.product.slug}` : '/shop'} className="relative w-28 h-28 bg-[#EFEDE6] rounded-xl overflow-hidden shrink-0">
                     {item.product.images?.[0] && (
                       <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                     )}
@@ -55,7 +55,7 @@ export default function CartPage() {
 
                   <div className="flex flex-col justify-between flex-grow">
                     <div className="flex justify-between items-start gap-4">
-                      <Link href={`/products/${item.product.slug}`} className="font-semibold text-[#1F2421] hover:text-[#5F7A5B] transition-colors">
+                      <Link href={item.product?.slug ? `/products/${item.product.slug}` : '/shop'} className="font-semibold text-[#1F2421] hover:text-[#5F7A5B] transition-colors">
                         {item.product.name}
                       </Link>
                       <p className="font-bold text-[#1F2421]">${(item.product.price * item.quantity).toFixed(2)}</p>

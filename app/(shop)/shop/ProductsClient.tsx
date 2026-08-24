@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { CATEGORIES } from '@/lib/constants'
 import { SlidersHorizontal } from 'lucide-react'
 import { FaCartPlus } from 'react-icons/fa'
+import { formatNaira } from '@/lib/utils'
 import type { Product } from '@/types/product'
 
 const TABS = ['All', ...CATEGORIES.map((c) => c.label)]
@@ -43,7 +44,7 @@ function ProductCard({ product }: { product: Product }) {
 
       <p className="text-[11px] uppercase tracking-widest text-[#8A928E] mb-1">{product.category}</p>
       <h3 className="text-sm font-semibold text-[#1F2421] mb-1 group-hover:text-[#5F7A5B] transition-colors">{product.name}</h3>
-      <p className="text-sm font-bold text-[#1F2421]">${product.price.toFixed(2)}</p>
+      <p className="text-sm font-bold text-[#1F2421]">{formatNaira(product.price)}</p>
     </Link>
   )
 }

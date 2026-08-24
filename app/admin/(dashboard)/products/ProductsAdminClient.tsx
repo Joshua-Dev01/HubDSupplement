@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 import { Plus, Pencil, Trash2, X, Loader2, AlertTriangle, Upload } from 'lucide-react'
 import { createProduct, updateProduct, deleteProduct, uploadProductImage } from '@/actions/admin-products'
-import { formatNaira } from '@/lib/utils'
+import { formatNaira, slugify } from '@/lib/utils'
 import { CATEGORIES } from '@/lib/constants'
 import type { Product } from '@/types/product'
 
@@ -29,11 +29,13 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
   const [uploading, setUploading] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [slugTouched, setSlugTouched] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   function openCreate() {
     setForm(EMPTY_FORM)
     setEditingId(null)
+    setSlugTouched(false)
     setShowForm(true)
   }
 
@@ -49,7 +51,26 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
       in_stock: product.in_stock,
     })
     setEditingId(product.id)
+    // Existing products already have a slug — don't overwrite it just
+    // because the admin tweaks the name while editing.
+    setSlugTouched(true)
     setShowForm(true)
+  }
+
+  function handleNameChange(name: string) {
+    setForm((f) => ({
+      ...f,
+      name,
+      // Auto-fill the slug from the name until the admin edits the
+      // slug field directly — that's what caused unslugified,
+      // broken-URL slugs like "Nourish and Glow" to get saved.
+      slug: slugTouched ? f.slug : slugify(name),
+    }))
+  }
+
+  function handleSlugChange(slug: string) {
+    setSlugTouched(true)
+    setForm((f) => ({ ...f, slug }))
   }
 
   async function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
@@ -95,7 +116,9 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
 
     const payload = {
       name: form.name,
-      slug: form.slug,
+      // Belt-and-braces: always run the slug through slugify() before
+      // it hits the DB, even if it was hand-edited or auto-filled.
+      slug: slugify(form.slug),
       price: parseFloat(form.price),
       category: form.category,
       images: form.images,
@@ -225,12 +248,12 @@ export default function ProductsAdminClient({ initialProducts }: { initialProduc
             <div className="flex flex-col gap-4">
               <div>
                 <label className="text-xs uppercase tracking-widest text-[#8A928E] mb-1.5 block">Name</label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} />
+                <input value={form.name} onChange={(e) => handleNameChange(e.target.value)} className={inputClass} />
               </div>
 
               <div>
                 <label className="text-xs uppercase tracking-widest text-[#8A928E] mb-1.5 block">Slug</label>
-                <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputClass} placeholder="e.g. daily-multivitamin" />
+                <input value={form.slug} onChange={(e) => handleSlugChange(e.target.value)} className={inputClass} placeholder="e.g. daily-multivitamin" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">

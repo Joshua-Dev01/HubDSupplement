@@ -73,7 +73,7 @@ export default function NewArrivalsClient({ products }: { products: Product[] })
         {/* Hero Product - Left Box */}
         {hero && (
           <Link
-            href={`/products/${hero.slug}`}
+            href={hero?.slug ? `/products/${hero.slug}` : '/shop'}
             className="md:col-span-7 lg:col-span-8 group relative overflow-hidden bg-neutral-50 aspect-[4/5] md:aspect-auto md:h-[680px] block"
           >
             <div className="absolute inset-0 z-0 overflow-hidden">
@@ -128,7 +128,7 @@ export default function NewArrivalsClient({ products }: { products: Product[] })
         {/* Second Product - Right Column Tall Box */}
         {second && (
           <Link
-            href={`/products/${second.slug}`}
+            href={second?.slug ? `/products/${second.slug}` : '/shop'}
             className="md:col-span-5 lg:col-span-4 group relative overflow-hidden bg-neutral-50 aspect-[4/5] md:aspect-auto md:h-[680px] block"
           >
             <div className="absolute inset-0 z-0 overflow-hidden">
@@ -181,7 +181,7 @@ export default function NewArrivalsClient({ products }: { products: Product[] })
           {[third, ...rest].filter(Boolean).slice(0, 3).map((product, i) => (
             <Link
               key={product!.id}
-              href={`/products/${product!.slug}`}
+              href={product!.slug ? `/products/${product!.slug}` : '/shop'}
               className="group relative overflow-hidden bg-neutral-50 aspect-[3/4] block"
             >
               <div className="absolute inset-0 z-0 overflow-hidden">

@@ -1,12 +1,24 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Star, ShoppingCart, Loader2 } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
+import { createClient } from '@/lib/supabase/client'
+import { formatNaira } from '@/lib/utils'
 import type { Product } from '@/types/product'
+import ProductReviews from '@/components/product/Productreviews'
+
+type Review = {
+  id: string
+  customer_name: string
+  customer_title: string | null
+  rating: number
+  body: string
+  created_at: string
+}
 
 export default function ProductDetailClient({ product }: { product: Product }) {
   const images = product.images?.length ? product.images : [
@@ -14,11 +26,60 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   ]
   const [activeImage, setActiveImage] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
+  const fetchReviewsRef = useRef<() => void>(() => {})
   const addItem = useCartStore((s) => s.addItem)
   const router = useRouter()
 
-  const rating = product.rating ?? 4.8
-  const reviewCount = product.review_count ?? 0
+  useEffect(() => {
+    const supabase = createClient()
+
+    async function fetchReviews() {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('id, customer_name, customer_title, rating, body, created_at')
+        .eq('product_id', product.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Product reviews fetch error:', error.message)
+        setReviewsLoading(false)
+        return
+      }
+
+      setReviews((data ?? []) as Review[])
+      setReviewsLoading(false)
+    }
+
+    fetchReviewsRef.current = fetchReviews
+    fetchReviews()
+
+    // Live updates — a new/edited/deleted review for this product
+    // reflects here immediately without a page refresh.
+    const channel = supabase
+      .channel(`product-reviews-${product.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reviews', filter: `product_id=eq.${product.id}` },
+        () => {
+          fetchReviews()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [product.id])
+
+  // Real average from this product's reviews. Falls back to the
+  // product's own `rating` field (if set) only when there are no
+  // reviews yet, so a brand-new product doesn't show "0 stars".
+  const reviewCount = reviews.length
+  const rating = reviewCount > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : product.rating ?? 0
   const supplyDays = product.supply_days ?? 30
   const isSoldOut = product.in_stock === false
 
@@ -44,6 +105,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   }
 
   return (
+    <>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
       {/* Left — Image gallery */}
       <div className="flex gap-4">
@@ -93,14 +155,14 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               <Star key={i} size={15} fill={i < Math.round(rating) ? 'currentColor' : 'none'} />
             ))}
           </div>
-          <span className="text-sm font-medium text-[#1F2421]">{rating}</span>
-          {reviewCount > 0 && (
+          {rating > 0 && <span className="text-sm font-medium text-[#1F2421]">{rating.toFixed(1)}</span>}
+          {!reviewsLoading && reviewCount > 0 && (
             <span className="text-sm text-[#8A928E]">({reviewCount.toLocaleString()} Reviews)</span>
           )}
         </div>
 
         <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-3xl font-bold text-[#1F2421]">₦{product.price.toFixed(2)}</span>
+          <span className="text-3xl font-bold text-[#1F2421]">{formatNaira(product.price)}</span>
           <span className="text-sm text-[#8A928E]">/ {supplyDays}-Day Supply</span>
         </div>
 
@@ -117,10 +179,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           {isSoldOut ? 'Sold Out' : 'Add to Cart'}
         </button>
 
-        <p className="text-xs text-[#8A928E] text-center">
+        {/* <p className="text-xs text-[#8A928E] text-center">
           Free shipping
-        </p>
+        </p> */}
       </div>
     </div>
+
+    <ProductReviews
+      productId={product.id}
+      reviews={reviews}
+      loading={reviewsLoading}
+      onReviewSubmitted={() => fetchReviewsRef.current()}
+    />
+    </>
   )
 }
