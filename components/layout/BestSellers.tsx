@@ -11,6 +11,24 @@ import { FaCartPlus } from 'react-icons/fa'
 
 const VISIBLE_COUNT = 4
 
+function ProductSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden border border-black/5">
+      <div className="aspect-[4/3] bg-[#EFEDE6] animate-pulse" />
+      <div className="p-5">
+        <div className="h-2.5 bg-black/10 rounded-full w-1/3 mb-3 animate-pulse" />
+        <div className="h-4 bg-black/10 rounded-full w-2/3 mb-2 animate-pulse" />
+        <div className="h-3 bg-black/10 rounded-full w-full mb-1.5 animate-pulse" />
+        <div className="h-3 bg-black/10 rounded-full w-4/5 mb-4 animate-pulse" />
+        <div className="flex items-center justify-between">
+          <div className="h-4 bg-black/10 rounded-full w-16 animate-pulse" />
+          <div className="w-9 h-9 rounded-full bg-black/10 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function BestSellers() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,7 +80,21 @@ export default function BestSellers() {
   const canGoForward = startIndex + VISIBLE_COUNT < products.length
 
   if (loading) {
-    return null
+    return (
+      <section className="px-6 pb-20">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-[#1F2421]">Find Ypur Supplement</h2>
+            <p className="text-sm text-[#8A928E] mt-1">The most trusted foundations for your daily ritual.</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {Array.from({ length: VISIBLE_COUNT }).map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
+        </div>
+      </section>
+    )
   }
 
   if (products.length === 0) {
@@ -70,10 +102,10 @@ export default function BestSellers() {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-6 pb-20">
+    <section className="px-6 pb-20">
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-[#1F2421]">Patient Favorites</h2>
+          <h2 className="text-2xl font-bold text-[#1F2421]">Find Your Supplement</h2>
           <p className="text-sm text-[#8A928E] mt-1">The most trusted foundations for your daily ritual.</p>
         </div>
         <div className="flex items-center gap-4">

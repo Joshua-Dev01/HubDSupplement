@@ -6,6 +6,12 @@ import {
   ShieldCheck,
   Snowflake,
   CheckCircle2,
+  Leaf,
+  TestTube2,
+  BadgeCheck,
+  Thermometer,
+  SprayCan,
+  Phone,
 } from "lucide-react";
 import { SITE } from "@/lib/constants";
 
@@ -66,67 +72,101 @@ const COMMITMENTS = [
   "Verified Cold-Chain Delivery",
 ];
 
+const SAFETY_STANDARDS = [
+  {
+    number: "01",
+    icon: Leaf,
+    title: "Premium & Authentic Sourcing",
+    desc: "We partner exclusively with certified manufacturers and verified global suppliers. Every raw ingredient is selected for maximum bioavailability, purity, and potency, ensuring you receive authentic products free from unverified additives.",
+  },
+  {
+    number: "02",
+    icon: TestTube2,
+    title: "Rigorous Testing & Quality Control",
+    desc: "All our products undergo strict batch testing to guarantee heavy metal safety, microbiological purity, and label accuracy. What is listed on our label is exactly what is inside the bottle — nothing more, nothing less.",
+  },
+  {
+    number: "03",
+    icon: BadgeCheck,
+    title: "Regulatory Compliance & Certification",
+    desc: "We operate in strict alignment with regulatory guidelines, including NAFDAC and Good Manufacturing Practice (GMP) standards. Our partner facilities maintain international certifications to uphold the highest hygienic and industrial protocols.",
+  },
+  {
+    number: "04",
+    icon: Thermometer,
+    title: "Optimal Storage & Shelf-Life Management",
+    desc: "Active nutrients degrade if exposed to improper heat, humidity, or light. Our inventory is stored in climate-controlled environments and continually audited for freshness so you always receive products at peak potency.",
+  },
+  {
+    number: "05",
+    icon: SprayCan,
+    title: "Clean & Transparent Formulations",
+    desc: "We prioritize clean wellness. Our product selection focuses on formulations free from unnecessary fillers, harmful synthetic preservatives, and banned substances.",
+  },
+];
+
 export default function AboutPage() {
   return (
-    <div className="pt-32 pb-20 bg-[#F7F5F0]">
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-24">
-        <div>
-          <p className="text-xs uppercase tracking-widest text-[#5F7A5B] font-medium mb-3">
-            Our Genesis
-          </p>
-          <h1 className="text-4xl md:text-5xl font-bold text-[#1F2421] leading-tight mb-5">
-            Trusted Medicine, Verified Care.
+    <div className="pt-24 pb-20 bg-[#F7F5F0]">
+      {/* Page title banner — background image */}
+      <section className="relative w-full h-56 sm:h-72 md:h-80 flex items-center justify-center overflow-hidden mb-16">
+        <img
+          src="./images/aboutPage.jpg"
+          alt="HubDsupplement — About Us"
+        />
+        <div className="absolute inset-0 bg-black/50 text-center" />
+        <div className="relative z-10 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white ">
+            About Us
           </h1>
-          <p className="text-sm text-[#3F4744] leading-relaxed mb-8 max-w-md">
-            {SITE.name} was founded on a simple belief: getting medication
-            shouldn&apos;t mean gambling on quality. We bridge licensed pharmacy
-            standards with the convenience of online ordering, so every capsule,
-            syrup, and tablet that reaches you has been verified, tested, and
-            handled by people who take that responsibility seriously.
+          <p className="text-xs sm:text-sm text-white/70 mt-3">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <span className="mx-2">/</span>
+            <span className="text-white">About Us</span>
           </p>
-          <Link
-            href="/shop"
-            className="inline-block bg-[#5F7A5B] hover:bg-[#4F6A4B] text-white text-sm font-medium px-6 py-3 rounded-full transition-colors"
-          >
-            Shop Our Pharmacy
-          </Link>
         </div>
+      </section>
 
-        <div className="relative">
-          <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
-            <Image
-              src="https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=800&q=80"
-              alt="Pharmacist preparing medication"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="absolute -bottom-6 left-6 bg-white rounded-2xl shadow-sm px-5 py-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#DCE5D3] flex items-center justify-center text-[#3F5C42] shrink-0">
-              <ShieldCheck size={16} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#1F2421]">
-                100% Verified
-              </p>
-              <p className="text-xs text-[#8A928E]">
-                From manufacturer to doorstep
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* Hero — Our Genesis */}
+      <section className="max-w-4xl mx-auto px-6 text-center mb-24">
+        <p className="text-xs uppercase tracking-widest text-[#5F7A5B] font-medium mb-3">
+          Our Genesis
+        </p>
+        <h2 className="text-3xl md:text-4xl font-bold text-[#1F2421] leading-tight mb-6">
+          Wellness Made Simple, Verified Care.
+        </h2>
+        <p className="text-sm text-[#3F4744] leading-relaxed mb-4 max-w-2xl mx-auto">
+          Welcome to {SITE.name}, your partner in everyday vitality. We know
+          that modern life is demanding, and staying on top of your health
+          can feel overwhelming. That&apos;s why we curated a range of
+          high-quality dietary supplements designed to seamlessly fit into
+          your daily routine — from essential vitamins and targeted wellness
+          solutions, to skin care, sexual health, and child nutrition, we
+          make feeling your best effortless.
+        </p>
+        <p className="text-sm text-[#3F4744] leading-relaxed mb-8 max-w-2xl mx-auto">
+          We don&apos;t believe in shortcuts or quick fixes. We believe in
+          sustainable, science-backed nutrition that fuels your lifestyle
+          from the inside out.
+        </p>
+        <Link
+          href="/shop"
+          className="inline-block bg-[#5F7A5B] hover:bg-[#4F6A4B] text-white text-sm font-medium px-6 py-3 rounded-full transition-colors"
+        >
+          Shop Our Wellness Range
+        </Link>
       </section>
 
       {/* Quality Assurance Process */}
       <section className="bg-[#EFEDE6] py-20 mb-24">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-[#1F2421] mb-3">
-            Our Quality Assurance Process
+            Why Choose {SITE.name}?
           </h2>
           <p className="text-sm text-[#8A928E] max-w-lg mx-auto mb-12">
-            Every medication we stock passes through a strict verification
-            protocol before it&apos;s made available for order.
+            We believe in authentic, high-potency ingredients, sourced from
+            trusted, certified manufacturers and formulated for real and
+            visible results.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -144,7 +184,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="max-w-6xl mx-auto px-6 mb-24">
+      {/* <section className="max-w-6xl mx-auto px-6 mb-24">
         <div className="flex items-end justify-between mb-10">
           <div>
             <p className="text-xs uppercase tracking-widest text-[#5F7A5B] font-medium mb-2">
@@ -181,10 +221,72 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
+      </section> */}
+
+      {/* Safety & Quality Standards */}
+      <section className="max-w-6xl mx-auto px-6 mb-24">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <p className="text-xs uppercase tracking-widest text-[#5F7A5B] font-medium mb-3">
+            Our Promise
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#1F2421] mb-4">
+            Our Safety &amp; Quality Standards
+          </h2>
+          <p className="text-sm text-[#8A928E] leading-relaxed">
+            At {SITE.name}, your health and safety are our highest priorities.
+            We know that what you put into your body matters, which is why we
+            enforce strict quality control protocols at every stage — from
+            ingredient selection to your doorstep.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {SAFETY_STANDARDS.map(({ number, icon: Icon, title, desc }, i) => (
+            <div
+              key={title}
+              className={`bg-white rounded-2xl p-7 flex gap-5 border border-black/5 ${
+                i === SAFETY_STANDARDS.length - 1 ? "md:col-span-2" : ""
+              }`}
+            >
+              <div className="shrink-0 flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-[#DCE5D3] flex items-center justify-center text-[#3F5C42]">
+                  <Icon size={20} />
+                </div>
+                <span className="text-[11px] font-bold text-[#B8C4B4] mt-2">
+                  {number}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#1F2421] mb-2">{title}</h3>
+                <p className="text-sm text-[#8A928E] leading-relaxed">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 bg-[#2E3634] rounded-2xl px-7 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+          <div>
+            <h3 className="font-semibold text-white mb-1.5">
+              Have questions about a specific batch or product?
+            </h3>
+            <p className="text-sm text-white/70 leading-relaxed max-w-md">
+              Our team is dedicated to complete transparency. Contact our
+              customer care team for product verification or safety
+              inquiries.
+            </p>
+          </div>
+          <a
+            href="tel:08103867139"
+            className="inline-flex items-center gap-2 bg-[#5F7A5B] hover:bg-[#4F6A4B] text-white text-sm font-medium px-6 py-3 rounded-full transition-colors shrink-0 whitespace-nowrap"
+          >
+            <Phone size={15} />
+            0810 386 7139
+          </a>
+        </div>
       </section>
 
       {/* Commitments */}
-      <section className="max-w-6xl mx-auto px-6 mb-24">
+      {/* <section className="max-w-6xl mx-auto px-6 mb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center bg-white rounded-3xl overflow-hidden">
           <div className="p-8 md:p-12">
             <p className="text-xs uppercase tracking-widest text-[#5F7A5B] font-medium mb-3">
@@ -221,7 +323,7 @@ export default function AboutPage() {
             />
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-6">
