@@ -6,11 +6,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { toast } from 'sonner'
-import { Minus, Plus, Trash2, ShieldCheck, Truck, RotateCcw, Award, ArrowRight, Loader2 } from 'lucide-react'
+import { Minus, Plus, Trash2, ShieldCheck, Truck, RotateCcw, Award, ArrowRight } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatNaira } from '@/lib/utils'
 import { createOrder } from '@/actions/orders'
 import { verifyPayment } from '@/actions/payment'
+import LeafSpinner from '@/components/ui/Leafspinner'
 
 type PaystackResponse = {
   reference: string
@@ -315,7 +316,7 @@ export default function CheckoutPage() {
                 disabled={processing}
                 className="w-full flex items-center cursor-pointer justify-center gap-2 bg-[#1F2421] hover:bg-[#2E3634] disabled:opacity-50 text-white font-medium py-4 rounded-full transition-colors mb-4"
               >
-                {processing ? <Loader2 size={16} className="animate-spin" /> : <>Pay Now <ArrowRight size={16} /></>}
+                {processing ? <LeafSpinner size={16} /> : <>Pay Now <ArrowRight size={16} /></>}
               </button>
 
               <div className="flex items-center justify-center gap-2 mb-6">

@@ -4,12 +4,13 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Star, ShoppingCart, Loader2 } from 'lucide-react'
+import { Star, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { createClient } from '@/lib/supabase/client'
 import { formatNaira } from '@/lib/utils'
 import type { Product } from '@/types/product'
 import ProductReviews from '@/components/product/Productreviews'
+import LeafSpinner from '@/components/ui/Leafspinner'
 
 type Review = {
   id: string
@@ -175,7 +176,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           disabled={loading || isSoldOut}
           className="flex items-center justify-center cursor-pointer gap-2 bg-[#5F7A5B] hover:bg-[#4F6A4B] disabled:opacity-50 text-white font-medium py-4 rounded-full transition-colors mb-3"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <ShoppingCart size={16} />}
+          {loading ? <LeafSpinner size={16} /> : <ShoppingCart size={16} />}
           {isSoldOut ? 'Sold Out' : 'Add to Cart'}
         </button>
 

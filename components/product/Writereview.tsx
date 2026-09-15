@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Star, Loader2 } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createCustomerReview } from '@/actions/reviews'
+import LeafSpinner from '../ui/Leafspinner'
 
 export default function WriteReview({
   productId,
@@ -135,7 +136,7 @@ export default function WriteReview({
           disabled={submitting || rating === 0 || !body.trim()}
           className="flex items-center justify-center gap-2 bg-[#5F7A5B] hover:bg-[#4F6A4B] disabled:opacity-50 text-white text-sm font-medium px-6 py-2.5 rounded-full transition-colors"
         >
-          {submitting && <Loader2 size={14} className="animate-spin" />}
+          {submitting && <LeafSpinner size={14} />}
           {submitting ? 'Submitting...' : hasExisting ? 'Update Review' : 'Submit Review'}
         </button>
         <button

@@ -108,15 +108,14 @@ const SAFETY_STANDARDS = [
 export default function AboutPage() {
   return (
     <div className="pt-24 pb-20 bg-[#F7F5F0]">
-      {/* Page title banner — background image */}
+      {/* Page title banner — background image with a multiply blend for a natural darken */}
       <section className="relative w-full h-56 sm:h-72 md:h-80 flex items-center justify-center overflow-hidden mb-16">
-        <img
-          src="./images/aboutPage.jpg"
-          alt="HubDsupplement — About Us"
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-black/70 bg-blend-multiply"
+          style={{ backgroundImage: "url('/images/aboutPage.jpg')" }}
         />
-        <div className="absolute inset-0 bg-black/50 text-center" />
-        <div className="relative z-10 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white ">
+        <div className="relative z-10 text-center px-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
             About Us
           </h1>
           <p className="text-xs sm:text-sm text-white/70 mt-3">

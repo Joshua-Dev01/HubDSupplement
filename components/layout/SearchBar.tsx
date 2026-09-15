@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Search, Loader2 } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Product } from '@/types/product'
+import LeafSpinner from '../ui/Leafspinner'
 
 export default function SearchBar({ className = '' }: { className?: string }) {
   const [query, setQuery] = useState('')
@@ -60,7 +61,7 @@ export default function SearchBar({ className = '' }: { className?: string }) {
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="relative">
         {loading ? (
-          <Loader2 size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A928E] animate-spin" />
+          <LeafSpinner size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A928E]" />
         ) : (
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A928E]" />
         )}

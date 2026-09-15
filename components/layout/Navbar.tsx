@@ -65,13 +65,13 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-40 bg-[#F7F5F0]/95 backdrop-blur border-b border-black/5 py-3 sm:py-4">
+      <nav className="w-full z-40 bg-[#F7F5F0]/95 backdrop-blur border-b border-black/5 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3 sm:gap-6">
           <Link href="/" className="flex items-center shrink-0">
             <img
               src="/images/logo1.png"
               alt={SITE.name ?? "Logo"}
-              className="h-10 w-auto object-contain sm:h-14 lg:h-16"
+              className="h-12 w-auto object-contain sm:h-14 md:h-16 lg:h-20"
             />
           </Link>
 

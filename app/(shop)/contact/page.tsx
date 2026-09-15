@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Mail, Phone, MapPin, Clock, Loader2, AlertTriangle } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, AlertTriangle } from 'lucide-react'
 import { sendContactMessage } from '@/actions/contact'
 import { SITE } from '@/lib/constants'
+import LeafSpinner from '@/components/ui/Leafspinner'
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
@@ -164,7 +165,7 @@ export default function ContactPage() {
                       disabled={sending}
                       className="flex items-center justify-center gap-2 bg-[#5F7A5B] hover:bg-[#4F6A4B] disabled:opacity-50 text-white font-medium px-8 py-3 rounded-full transition-colors"
                     >
-                      {sending && <Loader2 size={15} className="animate-spin" />}
+                      {sending && <LeafSpinner size={15} />}
                       {sending ? 'Sending...' : 'Send Message'}
                     </button>
                   </div>
