@@ -3,6 +3,7 @@ import './globals.css'
 import { Toaster } from 'sonner'
 import { SITE } from '@/lib/constants'
 import CartProvider from '@/components/cart/CartProvider'
+import GlobalLoadingOverlay from '@/components/ui/GlobalLoadingOverlay'
 
 export const metadata: Metadata = {
   title: { default: SITE.name, template: `%s | ${SITE.name}` },
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider>
           {children}
           <Toaster position="top-center" richColors />
+          <GlobalLoadingOverlay />
         </CartProvider>
       </body>
     </html>

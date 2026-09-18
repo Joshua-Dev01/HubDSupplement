@@ -2,10 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Sparkles, Brain, ShieldCheck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { ShieldCheck, Brain, ChevronDown, Leaf, ShoppingCart } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { formatNaira } from '@/lib/utils'
+import { useCartStore } from '@/store/cartStore'
 import type { Product } from '@/types/product'
 import Categories from './Categories'
 import BestSellers from './BestSellers'
@@ -13,9 +16,19 @@ import Perks from './Perks'
 import Testimonials from './Testimonials'
 import Newsletter from './Newsletter'
 import { SITE } from '@/lib/constants'
+import LeafSpinner from '../ui/Leafspinner'
+
+const STATS = [
+  { value: '100%', label: 'Verified Provenance' },
+  { value: '24–48h', label: 'Express Dispatch' },
+  { value: '60-Day', label: 'Wellness Promise' },
+]
 
 export default function Hero() {
   const [featured, setFeatured] = useState<Product | null>(null)
+  const [addingToCart, setAddingToCart] = useState(false)
+  const addItem = useCartStore((s) => s.addItem)
+  const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
@@ -35,90 +48,152 @@ export default function Hero() {
     fetchFeatured()
   }, [])
 
+  async function handleQuickAdd() {
+    if (!featured) return
+    setAddingToCart(true)
+    try {
+      const result = await addItem(featured.id)
+
+      if (result.error === 'not_authenticated') {
+        toast.error('Please log in to add items to your cart')
+        router.push('/login')
+        return
+      }
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+
+      toast.success('Added to cart')
+    } finally {
+      setAddingToCart(false)
+    }
+  }
+
   return (
     <>
-      <section className="relative w-full overflow-hidden pt-24 sm:pt-32 md:pt-36 pb-12 sm:pb-20 md:pb-24">
-        {/* Soft diagonal mint gradient, matching the brand green */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#F7F5F0] via-[#F3F7F1] to-[#DCEEE0]" />
-        <div className="absolute -right-24 sm:-right-40 -top-20 w-[320px] sm:w-[520px] h-[320px] sm:h-[520px] rounded-full bg-[#5F7A5B]/10 blur-3xl" />
+      <section className="w-full pt-24 sm:pt-28 md:pt-32 pb-8 sm:pb-12 px-4 sm:px-6">
+        <div className="relative max-w-7xl mx-auto rounded-[2rem] overflow-hidden min-h-[560px] sm:min-h-[600px] md:min-h-[640px] flex items-center">
+          {/* Background photo */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('/images/hero.png')" }}
+          />
+          {/* Dark brand-green gradient for text legibility */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1F2421]/90 via-[#1F2421]/60 to-[#1F2421]/20" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
-          {/* Left — copy */}
-          <div className="max-w-xl text-center md:text-left mx-auto md:mx-0">
-            <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm text-[#5F7A5B] mb-4 sm:mb-6">
-              <Sparkles size={16} className="sm:hidden" />
-              <Sparkles size={18} className="hidden sm:block" />
-            </span>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] sm:leading-[1.05] text-[#1F2421] mb-4 sm:mb-5">
-              {SITE.tagline}
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#3F4744]/80 leading-relaxed mb-6 sm:mb-8 max-w-sm mx-auto md:mx-0">
-              {SITE.description}
-            </p>
-
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 bg-[#5F7A5B] hover:bg-[#4F6A4B] text-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-full text-sm font-medium transition-colors shadow-lg shadow-[#5F7A5B]/20"
-            >
-              Choose a Product
-            </Link>
-          </div>
-
-          {/* Right — product image with floating badge cards */}
-          <div className="relative h-[300px] sm:h-[400px] md:h-[460px] flex items-center justify-center mt-4 md:mt-0">
+          <div className="relative z-10 w-full px-6 sm:px-10 md:px-14 py-10">
+            {/* Top-right floating badge */}
             <motion.div
-              initial={{ opacity: 0, y: 20, rotate: -6 }}
-              animate={{ opacity: 1, y: 0, rotate: -6 }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              className="relative w-44 sm:w-60 md:w-64 lg:w-72 aspect-[3/4] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-2xl"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="hidden md:flex absolute top-8 right-10 items-center gap-2 bg-white rounded-full shadow-lg px-4 py-2.5"
             >
-              <img src="/images/vitamin.png" className="object-cover w-full h-full" alt={featured?.name ?? 'Featured product'} />
+              <Brain size={14} className="text-[#5F7A5B]" />
+              <span className="text-xs font-medium text-[#1F2421]">Backed by science</span>
             </motion.div>
 
-            {featured?.category && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="absolute top-2 sm:top-6 left-0 sm:left-4 bg-white rounded-xl sm:rounded-2xl shadow-lg px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2"
-              >
-                <span className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-[#EFEDE6] flex items-center justify-center text-[#5F7A5B] shrink-0">
-                  <ShieldCheck size={11} className="sm:hidden" />
-                  <ShieldCheck size={14} className="hidden sm:block" />
-                </span>
-                <span className="text-[10px] sm:text-xs font-medium text-[#1F2421] capitalize whitespace-nowrap">
-                  {featured.category.replace('-', ' ')}
-                </span>
-              </motion.div>
-            )}
-
-            <motion.div
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="absolute bottom-8 sm:bottom-10 right-0 sm:right-2 bg-white rounded-xl sm:rounded-2xl shadow-lg px-2.5 sm:px-4 py-1.5 sm:py-2.5 flex items-center gap-1.5 sm:gap-2"
-            >
-              <span className="w-5 h-5 sm:w-7 sm:h-7 rounded-full bg-[#EFEDE6] flex items-center justify-center text-[#5F7A5B] shrink-0">
-                <Brain size={11} className="sm:hidden" />
-                <Brain size={14} className="hidden sm:block" />
+            <div className="max-w-xl">
+              <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 text-white text-[11px] font-medium px-4 py-2 rounded-full mb-5">
+                <ShieldCheck size={13} className="text-[#8FBF87]" />
+                NAFDAC Regulated &bull; 100% Authentic Quality
               </span>
-              <span className="text-[10px] sm:text-xs font-medium text-[#1F2421] whitespace-nowrap">Backed by science</span>
-            </motion.div>
 
-            {featured && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="absolute bottom-0 left-0 sm:left-8 bg-[#1F2421] text-white rounded-xl sm:rounded-2xl shadow-lg px-2.5 sm:px-4 py-1.5 sm:py-2.5"
-              >
-                <p className="text-[8px] sm:text-[10px] uppercase tracking-widest text-white/60 mb-0.5">Featured</p>
-                <p className="text-[10px] sm:text-xs font-semibold whitespace-nowrap">{formatNaira(featured.price)}</p>
-              </motion.div>
-            )}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] text-white mb-4 sm:mb-5">
+                {SITE.tagline}
+              </h1>
+
+              <p className="text-sm sm:text-base text-white/75 leading-relaxed mb-7 max-w-md">
+                Genuine medications and wellness essentials, verified for
+                potency and sourced only from licensed, certified
+                manufacturers. Every batch is cataloged, tested, and
+                cold-chain inspected before it reaches you.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 mb-10">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-[#1F2421] px-6 py-3.5 rounded-full text-sm font-semibold transition-colors"
+                >
+                  Choose a Product
+                  <ChevronDown size={15} />
+                </Link>
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 border border-white/30 hover:bg-white/10 text-white px-6 py-3.5 rounded-full text-sm font-medium transition-colors"
+                >
+                  <Leaf size={14} />
+                  Clinical Standards
+                </Link>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                {STATS.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl px-4 py-2.5"
+                  >
+                    <p className="text-sm font-bold text-white">{stat.value}</p>
+                    <p className="text-[10px] text-white/60">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+
+          {/* Floating featured-product card */}
+          {featured && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="hidden lg:block absolute bottom-10 right-10 bg-white rounded-2xl shadow-2xl p-4 w-72"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] uppercase tracking-widest text-[#8A928E] font-medium">
+                  Featured Essential &bull; {featured.in_stock === false ? 'Sold Out' : 'In Stock'}
+                </span>
+                <span className="text-[10px] font-semibold text-[#5F7A5B] bg-[#EFEDE6] px-2 py-0.5 rounded-full">
+                  Grade A
+                </span>
+              </div>
+
+              <div className="flex gap-3 mb-3">
+                <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#EFEDE6] shrink-0">
+                  {featured.images?.[0] && (
+                    <img src={featured.images[0]} alt={featured.name} className="w-full h-full object-cover" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-[#1F2421] truncate">{featured.name}</h3>
+                  <p className="text-xs text-[#8A928E] line-clamp-2 leading-snug">
+                    {featured.description ?? 'Verified, science-backed formulation.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-base font-bold text-[#1F2421]">{formatNaira(featured.price)}</p>
+                  <p className="text-[10px] text-[#8A928E]">Fast Nationwide Delivery</p>
+                </div>
+                <button
+                  onClick={handleQuickAdd}
+                  disabled={addingToCart || featured.in_stock === false}
+                  className="flex items-center gap-1.5 bg-[#5F7A5B] hover:bg-[#4F6A4B] disabled:opacity-50 text-white text-xs font-medium px-4 py-2.5 rounded-full transition-colors"
+                >
+                  {addingToCart ? <LeafSpinner size={13} /> : <ShoppingCart size={13} />}
+                  Add
+                </button>
+              </div>
+
+              <span className="inline-flex items-center gap-1.5 bg-[#EFEDE6] text-[#3F5C42] text-[10px] font-medium px-3 py-1.5 rounded-full">
+                <Leaf size={11} />
+                Pure Botanical &amp; Pharmaceutical Grade
+              </span>
+            </motion.div>
+          )}
         </div>
       </section>
 
