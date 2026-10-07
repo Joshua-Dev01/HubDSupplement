@@ -3,7 +3,18 @@ export type Product = {
   name: string
   slug: string
   price: number
-  category: 'vitamins' | 'protein' | 'herbal' | 'sleep' | 'immunity'
+  category:
+    | 'vitamins'
+    | 'protein'
+    | 'herbal'
+    | 'sleep'
+    | 'immunity'
+    | 'womens-health'
+    | 'fitness'
+    | 'sexual-health'
+    | 'children'
+    | 'beauty-skincare'
+    | 'mens-health'
   images: string[]
   description: string | null
   is_new: boolean
