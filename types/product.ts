@@ -15,6 +15,7 @@ export type Product = {
     | 'children'
     | 'beauty-skincare'
     | 'mens-health'
+    | 'Health Accessories'
   images: string[]
   description: string | null
   is_new: boolean
